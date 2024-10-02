@@ -7,7 +7,7 @@ function PrintSlip({ selectedStudent, feeData, onPrintComplete }) {
     const handlePrint = () => {
         setIsPrinting(true);
         window.print();
-        setIsPrinting(false);
+        // setIsPrinting(false);
     };
 
     return (
