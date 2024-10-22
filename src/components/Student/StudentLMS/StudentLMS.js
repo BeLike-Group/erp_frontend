@@ -118,7 +118,7 @@ const StudentTask = () => {
             {task.taskImage && (
               <img
                 src={task.taskImage}
-                alt="Task Image"
+                alt="Task "
                 className="w-full h-48 object-cover rounded mb-2"
               />
             )}
@@ -137,7 +137,7 @@ const StudentTask = () => {
               {task.taskImage && (
                 <img
                   src={task.taskImage}
-                  alt="Previous Task Image"
+                  alt="Previous Task "
                   className="w-full h-48 object-cover rounded mb-2"
                 />
               )}
@@ -165,7 +165,7 @@ const StudentTask = () => {
             {selectedTask.taskImage && (
               <img
                 src={selectedTask.taskImage}
-                alt="Task Image"
+                alt="Task "
                 className="w-full h-60 object-cover rounded mb-4"
               />
             )}

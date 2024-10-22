@@ -22,11 +22,11 @@ import StudentViewProfile from "./components/Student/StudentViewSubjects/Student
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import loadCurrentStudentAction from "./components/Redux/Student/Actions/loadCurrentStudentAction.Student";
-import RingLoader from "./components/Loaders/RingLoader";
+// import RingLoader from "./components/Loaders/RingLoader";
 import loadCurrentAdminAction from "./components/Redux/Admin/Actions/loadCurrentAdminAction.Admin";
 import Landingpage from "./components/Landing/Landing";
 import SchoolData from "./components/School/SchoolPortal/SchoolData.jsx";
-import SchoolPortalHome from "./components/School/SchoolPortal/SchoolPortal.js";
+// import SchoolPortalHome from "./components/School/SchoolPortal/SchoolPortal.js";
 import One from "./components/School/Grades/One/One.js";
 import Two from "./components/School/Grades/Two/Two.js";
 import Three from "./components/School/Grades/Three/Three.js";
@@ -58,7 +58,7 @@ import Addmisionsall from "./components/School/SchoolPortal/Addmisionsall.js";
 import Board from "./components/School/SchoolPortal/Board.js";
 
 import ReceiptApp from "./components/Landing/Receipt";
-import Accounts from "./components/Landing/Accounts";
+// import Accounts from "./components/Landing/Accounts";
 import TeacherSlip from "./components/Landing/TeacherSlip";
 import First from "./components/University/Department/Commerce/First";
 import UniPortal from "./components/University/Portal/UniPortal";
@@ -128,7 +128,7 @@ import Legal from "./LegalServices/Legal.js";
 
 import Syllabus1to10 from "./components/School/SchoolPortal/Syllabus1to10.js";
 import Stu from "./components/School/SchoolPortal/Student/Stu.jsx";
-import StudentCourseTimeTable from "./components/Student/StudentCourseTimetable/StudentCourseTimeTable.js";
+// import StudentCourseTimeTable from "./components/Student/StudentCourseTimetable/StudentCourseTimeTable.js";
 import Tec from "./components/School/SchoolPortal/Teacher/Tec.js";
 import Adm from "./components/School/SchoolPortal/Admins/Adm.js";
 
@@ -151,7 +151,7 @@ import RegisterAndLoginForm from "./components/Chat/RegisterAndLoginForm";
 import DrillingSchool from "./components/School/SchoolPortal/DrillingSchools";
 
 function App() {
-  const { username, id } = useContext(UserContext);
+  const { username } = useContext(UserContext);
 
   const dispatch = useDispatch();
   const [studentLoading, setStudentLoading] = useState(true);

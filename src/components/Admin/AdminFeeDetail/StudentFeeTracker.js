@@ -239,7 +239,7 @@ const StudentFeeTracker = () => {
       );
 
       handleCloseModal();
-      fetchFeeRecords(); // Refresh fee records
+      // fetchFeeRecords(); // Refresh fee records
     } catch (error) {
       handleShowFailureToast(
         error.response?.data?.message || "Failed to create fee record"

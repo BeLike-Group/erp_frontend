@@ -7,7 +7,7 @@ import Footer from "../Footer/Footer.js";
 import Info from "./Info.js";
 import Team from "./Team.js";
 import Investor from "./Investor.js";
-import heroimg from "../../Assets/hero-section-img.webp";
+// import heroimg from "../../Assets/hero-section-img.webp";
 import schoolimg from "../../Assets/school.webp";
 import collegeimg from "../../Assets/college.webp";
 import universityimg from "../../Assets/uni.webp";
@@ -96,7 +96,7 @@ const Landingpage = () => {
           >
             <img
               src={chat}
-              alt="Top Right Image"
+              alt=""
               className="absolute top-4 right-8 w-24 h-24 sm:w-40 sm:h-40 object-contain cursor-pointer hover:opacity-80 transition duration-300"
             />
           </a>
