@@ -17,9 +17,7 @@ import schoolportallogo13 from "../../Assets/Img/brook.jpg"; // Replace with you
 import schoolportallogo14 from "../../Assets/Img/elite.png"; // Replace with your actual school portal logo pathafaq.jpeg
 import schoolportallogo15 from "../../Assets/Img/Alpha.jpg"; // Replace with your actual school portal logo pathafaq.jpeg
 import schoolportallogo16 from "../../Assets/Img/preforces.jpg"; // Replace with your actual school portal logo pathafaq.jpeg
-
-
-
+import schoolportallogo17 from "../../Assets/Img/markhor.png"; // Replace with your actual school portal logo pathafaq.jpeg
 
 // import "./SchoolBlocks.css"
 
@@ -42,20 +40,19 @@ const SchoolBlocks = () => {
       logo: schoolportallogo3, // Replace with your actual school logo path
       link: "/pak-sub-campus", // Replace with the actual login link
     },
-    
+
     {
       name: "The Learning Way School System",
       logo: schoolportallogo4, // Replace with your actual school logo path
       link: "/lwss-sub-campus", // Replace with the actual login link
     },
-    
 
     {
       name: "Amal Academy",
       logo: schoolportallogo5, // Replace with your actual school logo path
       link: "/admin-login", // Replace with the actual login link
     },
-    
+
     {
       name: "Afaq School",
       logo: schoolportallogo6, // Replace with your actual school logo path
@@ -111,11 +108,18 @@ const SchoolBlocks = () => {
       logo: schoolportallogo16, // Replace with your actual school logo path
       link: "/admin-login", // Replace with the actual login link
     },
+    {
+      name: "Markhor School System",
+      logo: schoolportallogo17, // Replace with your actual school logo path
+      link: "/admin-login", // Replace with the actual login link
+    },
   ];
   return (
     <div className="container pt-3 mx-auto">
       <div className="text-center d-flex justify-content-center items-center">
-        <h1 className="text-center school text-3xl font-bold">Belike Edu. Software</h1>
+        <h1 className="text-center school text-3xl font-bold">
+          Belike Edu. Software
+        </h1>
         <img
           alt="Belike Edu. Logo"
           className="ms-lg-2 logo ml-3"
@@ -140,15 +144,13 @@ const SchoolBlocks = () => {
                 alt={school.name}
                 className="w-20 h-20 object-contain"
               />
-              <h1 className="text-black text-center text-base font-semibold">{school.name}</h1>
+              <h1 className="text-black text-center text-base font-semibold">
+                {school.name}
+              </h1>
             </div>
           </NavLink>
         ))}
       </div>
-
-
-
-      
     </div>
   );
 };

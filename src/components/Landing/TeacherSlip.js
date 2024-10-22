@@ -17,11 +17,18 @@ const TeacherSlip = () => {
 
   const [entries, setEntries] = useState([]);
 
+  // Fetch entries from the API when the component mounts
   useEffect(() => {
-    const storedEntries = JSON.parse(localStorage.getItem("entries"));
-    if (storedEntries) {
-      setEntries(storedEntries);
-    }
+    const fetchEntries = async () => {
+      try {
+        const response = await axios.get("/api/v1/admin/teacher-slip");
+        setEntries(response.data); // Assuming the response data is an array of entries
+      } catch (error) {
+        handleShowFailureToast("Failed to fetch entries. Please try again.");
+      }
+    };
+
+    fetchEntries();
   }, []);
 
   useEffect(() => {
@@ -33,9 +40,28 @@ const TeacherSlip = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleAddEntry = (e) => {
+  const handleAddEntry = async (e) => {
     e.preventDefault();
-    setEntries([...entries, { ...formData, salary: parseFloat(formData.salary) }]);
+
+    try {
+      const response = await axios.post("/api/v1/admin/teacher-slip", {
+        ...formData,
+        salary: parseFloat(formData.salary),
+      });
+
+      // Assuming the response contains the saved entry or a confirmation
+      if (response.status === 200) {
+        setEntries([
+          ...entries,
+          { ...formData, salary: parseFloat(formData.salary) },
+        ]);
+        handleShowSuccessToast("Entry added successfully!");
+      }
+    } catch (error) {
+      handleShowFailureToast("Failed to add entry. Please try again.");
+    }
+
+    // Clear the form after submission
     setFormData({ date: "", name: "", designation: "", salary: "", class: "" });
   };
 
@@ -60,7 +86,9 @@ const TeacherSlip = () => {
             <h2 className="text-lg font-bold mb-4">Enter Details</h2>
             <form className="space-y-4" onSubmit={handleAddEntry}>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Date</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Date
+                </label>
                 <input
                   type="date"
                   name="date"
@@ -70,7 +98,9 @@ const TeacherSlip = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Name
+                </label>
                 <input
                   type="text"
                   name="name"
@@ -80,7 +110,9 @@ const TeacherSlip = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Designation</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Designation
+                </label>
                 <input
                   type="text"
                   name="designation"
@@ -90,7 +122,9 @@ const TeacherSlip = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Salary</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Salary
+                </label>
                 <input
                   type="number"
                   name="salary"
@@ -100,7 +134,9 @@ const TeacherSlip = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Class</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Class
+                </label>
                 <input
                   type="text"
                   name="class"
@@ -129,7 +165,9 @@ const TeacherSlip = () => {
           <div id="print-section">
             {entries.length > 0 && (
               <div>
-                <h2 className="text-slate-600 font-bold text-sm py-6 uppercase">Summary</h2>
+                <h2 className="text-slate-600 font-bold text-sm py-6 uppercase">
+                  Summary
+                </h2>
                 <div className="bg-slate-100 px-6 py-2 rounded-md">
                   <table className="w-full">
                     <thead>
@@ -148,11 +186,15 @@ const TeacherSlip = () => {
                           <td className="py-2">{entry.name}</td>
                           <td className="py-2">{entry.designation}</td>
                           <td className="py-2">{entry.class}</td>
-                          <td className="py-2">Rs: {entry.salary.toFixed(2)}</td>
+                          <td className="py-2">
+                            Rs: {entry.salary.toFixed(2)}
+                          </td>
                         </tr>
                       ))}
                       <tr className="font-bold text-slate-700">
-                        <td className="py-2" colSpan="4">Total Salaries</td>
+                        <td className="py-2" colSpan="4">
+                          Total Salaries
+                        </td>
                         <td className="py-2">Rs: {totalSalary.toFixed(2)}</td>
                       </tr>
                     </tbody>

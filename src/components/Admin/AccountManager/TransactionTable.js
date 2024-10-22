@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const TransactionTable = ({ transactions, onDelete, onUpdate }) => {
   return (
@@ -6,7 +6,9 @@ const TransactionTable = ({ transactions, onDelete, onUpdate }) => {
       <table className="min-w-full bg-dark-blue text-white shadow-lg">
         <thead>
           <tr className="bg-blue-900 text-left">
-            <th className="py-3 px-6 border-b border-gray-700">Transaction Name</th>
+            <th className="py-3 px-6 border-b border-gray-700">
+              Transaction Name
+            </th>
             <th className="py-3 px-6 border-b border-gray-700">Type</th>
             <th className="py-3 px-6 border-b border-gray-700">Amount (Rs:)</th>
             <th className="py-3 px-6 border-b border-gray-700">Description</th>
@@ -15,31 +17,55 @@ const TransactionTable = ({ transactions, onDelete, onUpdate }) => {
           </tr>
         </thead>
         <tbody>
-          {transactions.map((transaction, index) => (
-            <tr key={index} className="bg-blue-800 hover:bg-blue-700 transition-colors duration-200">
-              <td className="py-3 px-6 border-b border-gray-700">{transaction.name}</td>
-              <td className="py-3 px-6 border-b border-gray-700">{transaction.type}</td>
-              <td className={`py-3 px-6 border-b border-gray-700 ${transaction.type === 'Expenditure' ? 'text-red-400' : 'text-green-400'}`}>
+          {transactions.map((transaction) => (
+            <tr
+              key={transaction._id}
+              className="bg-blue-800 hover:bg-blue-700 transition-colors duration-200"
+            >
+              <td className="py-3 px-6 border-b border-gray-700">
+                {transaction.name}
+              </td>
+              <td className="py-3 px-6 border-b border-gray-700">
+                {transaction.type}
+              </td>
+              <td
+                className={`py-3 px-6 border-b border-gray-700 ${
+                  transaction.type === "Expenditure"
+                    ? "text-red-400"
+                    : "text-green-400"
+                }`}
+              >
                 Rs:{transaction.amount}
               </td>
-              <td className="py-3 px-6 border-b border-gray-700">{transaction.description}</td>
-              <td className="py-3 px-6 border-b border-gray-700">{transaction.date}</td>
               <td className="py-3 px-6 border-b border-gray-700">
-                {/* <button
+                {transaction.description}
+              </td>
+              <td className="py-3 px-6 border-b border-gray-700">
+                {new Date(transaction.date).toLocaleDateString()}
+              </td>
+              <td className="py-3 px-6 border-b border-gray-700">
+                <button
                   onClick={() => onUpdate(transaction)}
-                  className="mr-2 bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-600 transition-colors duration-200"
+                  className={`mr-2 bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-600 transition-colors duration-200 `}
                 >
                   Update
-                </button> */}
+                </button>
                 <button
                   onClick={() => onDelete(transaction._id)}
-                  className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition-colors duration-200"
+                  className={`bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition-colors duration-200 `}
                 >
                   Delete
                 </button>
               </td>
             </tr>
           ))}
+          {transactions.length === 0 && (
+            <tr>
+              <td colSpan="6" className="text-center py-4">
+                No transactions found.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

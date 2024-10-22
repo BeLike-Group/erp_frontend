@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const TransactionModal = ({ isOpen, onClose, onSave }) => {
   const [transaction, setTransaction] = useState({
-    studentName: '',
-    rollNumber: '',
-    grade: '',
-    totalFees: '',
-    amountPaid: '',
+    studentName: "",
+    rollNumber: "",
+    grade: "",
+    totalFees: "",
+    amountPaid: "",
     remainingAmount: 0, // Calculated field
-    status: '', // 'Fully Paid' or 'Remaining'
+    status: "", // 'Fully Paid' or 'Remaining'
     date: new Date().toISOString().slice(0, 10),
   });
 
@@ -17,11 +17,13 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
     let updatedTransaction = { ...transaction, [name]: value };
 
     // Calculate the remaining amount and status
-    if (name === 'totalFees' || name === 'amountPaid') {
-      const totalFees = name === 'totalFees' ? Number(value) : Number(transaction.totalFees);
-      const amountPaid = name === 'amountPaid' ? Number(value) : Number(transaction.amountPaid);
+    if (name === "totalFees" || name === "amountPaid") {
+      const totalFees =
+        name === "totalFees" ? Number(value) : Number(transaction.totalFees);
+      const amountPaid =
+        name === "amountPaid" ? Number(value) : Number(transaction.amountPaid);
       const remainingAmount = totalFees - amountPaid;
-      const status = remainingAmount === 0 ? 'Fully Paid' : 'Remaining';
+      const status = remainingAmount === 0 ? "Fully Paid" : "Remaining";
       updatedTransaction = { ...updatedTransaction, remainingAmount, status };
     }
 
@@ -47,7 +49,9 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
         >
           &times;
         </button>
-        <h2 className="text-xl font-semibold mb-4 text-center">Add Fee Record</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          Add Fee Record
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">

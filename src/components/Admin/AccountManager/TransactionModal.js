@@ -1,19 +1,34 @@
-import React, { useState } from 'react';
+// TransactionModal.jsx
+import React, { useState, useEffect } from "react";
 
-const TransactionModal = ({ isOpen, onClose, onSave }) => {
+const TransactionModal = ({ isOpen, onClose, onSave, editingTransaction }) => {
   const [transaction, setTransaction] = useState({
-    name: '',
-    amount: '',
-    description: '',
-    type: 'Income', // Default to 'Income'
+    name: "",
+    amount: "",
+    description: "",
+    type: "Income",
     date: new Date().toISOString().slice(0, 10),
   });
 
   const [errors, setErrors] = useState({
-    name: '',
-    amount: '',
-    description: '',
+    name: "",
+    amount: "",
+    description: "",
   });
+
+  useEffect(() => {
+    if (editingTransaction) {
+      setTransaction(editingTransaction);
+    } else {
+      setTransaction({
+        name: "",
+        amount: "",
+        description: "",
+        type: "Income",
+        date: new Date().toISOString().slice(0, 10),
+      });
+    }
+  }, [editingTransaction]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,20 +37,20 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
 
   const validateForm = () => {
     let isValid = true;
-    let newErrors = { name: '', amount: '', description: '' };
+    let newErrors = { name: "", amount: "", description: "" };
 
     if (!transaction.name.trim()) {
-      newErrors.name = 'Transaction name is required';
+      newErrors.name = "Transaction name is required";
       isValid = false;
     }
 
     if (!transaction.amount || transaction.amount <= 0) {
-      newErrors.amount = 'Amount should be a positive number';
+      newErrors.amount = "Amount should be a positive number";
       isValid = false;
     }
 
     if (!transaction.description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = "Description is required";
       isValid = false;
     }
 
@@ -47,7 +62,8 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
     e.preventDefault();
     if (validateForm()) {
       onSave(transaction);
-      onClose(); // Close modal after successful save
+      // Remove onClose() here because onSave already handles closing
+      // onClose();
     }
   };
 
@@ -55,7 +71,7 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white w-full max-w-lg p-6 rounded-lg shadow-lg relative h-1/2 overflow-y-auto">
+      <div className="bg-white w-full max-w-lg p-6 rounded-lg shadow-lg relative h-auto overflow-y-auto">
         <button
           type="button"
           onClick={onClose}
@@ -64,7 +80,9 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
         >
           &times;
         </button>
-        <h2 className="text-xl font-semibold mb-4 text-center">Add Transaction</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          {editingTransaction ? "Update Transaction" : "Add Transaction"}
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name Field */}
           <div>
@@ -77,11 +95,13 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
               value={transaction.name}
               onChange={handleChange}
               className={`shadow appearance-none border ${
-                errors.name ? 'border-red-500' : ''
+                errors.name ? "border-red-500" : ""
               } rounded w-full py-2 px-3 text-gray-700`}
               required
             />
-            {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-xs">{errors.name}</p>
+            )}
           </div>
 
           {/* Amount Field */}
@@ -95,11 +115,13 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
               value={transaction.amount}
               onChange={handleChange}
               className={`shadow appearance-none border ${
-                errors.amount ? 'border-red-500' : ''
+                errors.amount ? "border-red-500" : ""
               } rounded w-full py-2 px-3 text-gray-700`}
               required
             />
-            {errors.amount && <p className="text-red-500 text-xs">{errors.amount}</p>}
+            {errors.amount && (
+              <p className="text-red-500 text-xs">{errors.amount}</p>
+            )}
           </div>
 
           {/* Description Field */}
@@ -112,11 +134,13 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
               value={transaction.description}
               onChange={handleChange}
               className={`shadow appearance-none border ${
-                errors.description ? 'border-red-500' : ''
+                errors.description ? "border-red-500" : ""
               } rounded w-full py-2 px-3 text-gray-700`}
               required
             />
-            {errors.description && <p className="text-red-500 text-xs">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-xs">{errors.description}</p>
+            )}
           </div>
 
           {/* Transaction Type Field */}
@@ -164,7 +188,7 @@ const TransactionModal = ({ isOpen, onClose, onSave }) => {
               type="submit"
               className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200"
             >
-              Save
+              {editingTransaction ? "Update" : "Save"}
             </button>
           </div>
         </form>
