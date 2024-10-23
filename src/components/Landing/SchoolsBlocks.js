@@ -18,6 +18,7 @@ import schoolportallogo14 from "../../Assets/Img/elite.png"; // Replace with you
 import schoolportallogo15 from "../../Assets/Img/Alpha.jpg"; // Replace with your actual school portal logo pathafaq.jpeg
 import schoolportallogo16 from "../../Assets/Img/preforces.jpg"; // Replace with your actual school portal logo pathafaq.jpeg
 import schoolportallogo17 from "../../Assets/Img/markhor.png"; // Replace with your actual school portal logo pathafaq.jpeg
+import schoolportallogo18 from "../../Assets/Img/UIES.jpg"; // Replace with your actual school portal logo pathafaq.jpeg
 
 // import "./SchoolBlocks.css"
 
@@ -111,6 +112,11 @@ const SchoolBlocks = () => {
     {
       name: "Markhor School System",
       logo: schoolportallogo17, // Replace with your actual school logo path
+      link: "/admin-login", // Replace with the actual login link
+    },
+    {
+      name: "U.I.E.S Nishat Colony",
+      logo: schoolportallogo18, // Replace with your actual school logo path
       link: "/admin-login", // Replace with the actual login link
     },
   ];
