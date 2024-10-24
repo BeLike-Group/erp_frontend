@@ -12,8 +12,7 @@ Modal.setAppElement("#root"); // Ensure the modal is attached to the root for ac
 
 const StudentFeeTracker = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [newFeeModalOpen, setNewFeeModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null); // Store selected student for modal
   const [totalFee, setTotalFee] = useState("");
   const [amountReceived, setAmountReceived] = useState("");
   const [remainingAmount, setRemainingAmount] = useState("");
@@ -21,23 +20,36 @@ const StudentFeeTracker = () => {
   const [grades, setGrades] = useState([]);
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
-  const [feeRecords, setFeeRecords] = useState([]); // Store fee records
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("");
   const [rollNumber, setRollNumber] = useState("");
-  const [showPrintSlip, setShowPrintSlip] = useState(false);
-  const [printSlipData, setPrintSlipData] = useState(null);
+  const [showPrintSlip, setShowPrintSlip] = useState(false); // State to control PrintSlip display
+  const [printSlipData, setPrintSlipData] = useState(null); // Separate state for PrintSlip data
 
+  // Fetch students data from the backend
   useEffect(() => {
-    const fetchAllStudents = async () => {
+    const fetchAllTransactions = async () => {
       try {
         const response = await axios.get("/api/v1/admin/load-all-students");
-        setStudents(response?.data?.students || []);
+        const studentsData = response?.data?.students || [];
+
+        // Calculate remaining amount based on total fee and amount paid
+        const studentsWithRemaining = studentsData.map((student) => {
+          const totalFee = student.studentFee;
+          const amountPaid = student.amountPaid || 0;
+          const remaining = totalFee - amountPaid; // Calculate remaining amount
+
+          return {
+            ...student,
+            remainingAmount: remaining < 0 ? 0 : remaining, // Ensure remaining amount doesn't go below zero
+          };
+        });
+
+        setStudents(studentsWithRemaining);
+        setFilteredStudents(studentsWithRemaining); // Initialize filtered students
         setGrades([
           ...new Set(
-            response?.data?.students.map(
-              (fee) => fee.studentGrade.gradeCategory
-            )
+            studentsWithRemaining.map((fee) => fee.studentGrade.gradeCategory)
           ),
         ]);
       } catch (error) {
@@ -48,22 +60,10 @@ const StudentFeeTracker = () => {
       }
     };
 
-    const fetchFeeRecords = async () => {
-      try {
-        const response = await axios.get("/api/v1/admin/get-student-fee");
-        setFeeRecords(response.data.data || []);
-      } catch (error) {
-        console.error(error.response?.data?.message || error.message);
-        handleShowFailureToast(
-          error.response?.data?.message || "Failed to load fee records"
-        );
-      }
-    };
-
-    fetchAllStudents();
-    fetchFeeRecords();
+    fetchAllTransactions();
   }, []);
 
+  // Filter students based on selected criteria
   useEffect(() => {
     const filterStudents = () => {
       let filtered = students;
@@ -93,11 +93,12 @@ const StudentFeeTracker = () => {
     filterStudents();
   }, [students, selectedStatus, selectedGrade, rollNumber]);
 
+  // Handle clicking the "Edit Fee" button
   const handleAddFeeClick = (student) => {
     setSelectedStudent(student);
     setTotalFee(student.studentFee);
-    setAmountReceived(student.amountReceived || 0);
-    setRemainingAmount(student.remainingAmount);
+    setAmountReceived(student.amountReceived || 0); // Initialize as 0 if undefined
+    setRemainingAmount(student.remainingAmount || student.studentFee); // Use calculated remainingAmount
     setSubmissionDate(
       student.submissionDate
         ? new Date(student.submissionDate).toISOString().substr(0, 10)
@@ -106,15 +107,16 @@ const StudentFeeTracker = () => {
     setModalOpen(true);
   };
 
+  // Handle closing the modal and resetting form fields (without resetting selectedStudent)
   const handleCloseModal = () => {
     setModalOpen(false);
-    setNewFeeModalOpen(false);
     setTotalFee("");
     setAmountReceived("");
     setRemainingAmount("");
     setSubmissionDate("");
   };
 
+  // Handle changes in the "Amount Received" input
   const handleAmountReceivedChange = (e) => {
     const received = parseFloat(e.target.value) || 0;
     setAmountReceived(received);
@@ -122,6 +124,7 @@ const StudentFeeTracker = () => {
     setRemainingAmount(calculatedRemaining >= 0 ? calculatedRemaining : 0);
   };
 
+  // Handle changes in the "Total Fee" input
   const handleTotalFeeChange = (e) => {
     const fee = parseFloat(e.target.value) || 0;
     setTotalFee(fee);
@@ -129,8 +132,11 @@ const StudentFeeTracker = () => {
     setRemainingAmount(calculatedRemaining >= 0 ? calculatedRemaining : 0);
   };
 
+  // Handle submitting the fee
+  // Handle submitting the fee
   const handleSubmitFee = async () => {
     try {
+      // Validations
       if (!submissionDate) {
         handleShowFailureToast("Please select a submission date.");
         return;
@@ -141,50 +147,45 @@ const StudentFeeTracker = () => {
         return;
       }
 
+      // Prepare fee data for the frontend calculations
+      const adminId = "someAdminId"; // Replace with actual admin ID logic
       const feeData = {
         studentName: selectedStudent.studentName,
         rollNumber: selectedStudent.studentId,
-        grade: selectedStudent.studentGrade.gradeCategory,
+        grade: selectedStudent.studentGrade.gradeCategory, // Assuming you need only the grade category
         totalFees: totalFee,
         amountPaid: amountReceived,
-        remainingAmount: remainingAmount,
+        remainingAmount: remainingAmount, // This will stay only on the frontend
         date: submissionDate,
+        adminId: adminId,
       };
 
-      let response;
+      // Submit fee data to backend (local fee creation)
+      const response = await axios.post(
+        "/api/v1/admin/create-student-fee",
+        feeData
+      );
 
-      if (selectedStudent.feeRecordId) {
-        // Update existing fee record
-        response = await axios.put(
-          `/api/v1/admin/update-student-fee/${selectedStudent.feeRecordId}`,
-          feeData
-        );
-      } else {
-        // Create a new fee record
-        response = await axios.post(
-          "/api/v1/admin/create-student-fee",
-          feeData
-        );
-      }
-
+      console.log(response.data);
       handleShowSuccessToast(
         response.data.message || "Fee submitted successfully."
       );
 
+      // Prepare data for PrintSlip
       setPrintSlipData({
         studentName: selectedStudent.studentName,
         rollNumber: selectedStudent.studentId,
         grade: selectedStudent.studentGrade.gradeCategory,
         totalFee: totalFee,
         amountReceived: amountReceived,
-        remainingAmount: remainingAmount,
+        remainingAmount: remainingAmount, // Calculated and only used on the frontend
         submissionDate: submissionDate,
       });
 
+      // Show PrintSlip
       setShowPrintSlip(true);
-      handleCloseModal();
 
-      // Update local state
+      // Update the student in the local `students` state without re-fetching
       setStudents((prevStudents) =>
         prevStudents.map((student) =>
           student.studentId === selectedStudent.studentId
@@ -192,11 +193,29 @@ const StudentFeeTracker = () => {
                 ...student,
                 studentFee: totalFee,
                 amountReceived: amountReceived,
-                remainingAmount: remainingAmount,
+                remainingAmount: remainingAmount, // Calculated locally, not saved to backend
                 submissionDate: submissionDate,
               }
             : student
         )
+      );
+
+      // Close the modal without resetting selectedStudent
+      handleCloseModal();
+
+      // PATCH request to update the student's fee and amount paid (not remaining amount)
+      const updateResponse = await axios.patch(
+        `/api/v1/admin/update-student/${selectedStudent._id}`, // Use _id here
+        {
+          studentFee: totalFee,
+          amountPaid: amountReceived,
+          submissionDate: submissionDate, // Only updating the fields allowed on the backend
+        }
+      );
+
+      console.log(updateResponse.data);
+      handleShowSuccessToast(
+        updateResponse.data.message || "Student record updated successfully."
       );
     } catch (error) {
       handleShowFailureToast(
@@ -206,65 +225,26 @@ const StudentFeeTracker = () => {
     }
   };
 
+  // Handle completing the print slip process
   const handlePrintComplete = () => {
+    // Hide PrintSlip and reset printSlipData and selectedStudent
     setShowPrintSlip(false);
     setSelectedStudent(null);
     setPrintSlipData(null);
-  };
-
-  const handleNewFeeSubmit = async () => {
-    try {
-      if (!submissionDate) {
-        handleShowFailureToast("Please select a submission date.");
-        return;
-      }
-
-      const feeData = {
-        studentName: selectedStudent.studentName,
-        rollNumber: selectedStudent.studentId,
-        grade: selectedStudent.studentGrade.gradeCategory,
-        totalFees: totalFee,
-        amountPaid: amountReceived,
-        remainingAmount: remainingAmount,
-        date: submissionDate,
-      };
-
-      const response = await axios.post(
-        "/api/v1/admin/create-student-fee",
-        feeData
-      );
-
-      handleShowSuccessToast(
-        response.data.message || "New fee record created successfully."
-      );
-
-      handleCloseModal();
-      // fetchFeeRecords(); // Refresh fee records
-    } catch (error) {
-      handleShowFailureToast(
-        error.response?.data?.message || "Failed to create fee record"
-      );
-      console.error(error.response?.data?.message || error.message);
-    }
   };
 
   return (
     <div className="p-4 bg-gray-800 min-h-screen">
       <Toaster />
 
+      {/* Conditionally render the StudentFeeTracker or the PrintSlip */}
       {!showPrintSlip ? (
         <>
           <h1 className="text-3xl font-bold text-white mb-4">
             Student Fee Tracker
           </h1>
 
-          <button
-            onClick={() => setNewFeeModalOpen(true)}
-            className="bg-green-500 text-white px-4 py-2 rounded mb-4"
-          >
-            New Fee
-          </button>
-
+          {/* Filters */}
           <div className="mb-4 text-black flex flex-wrap items-center">
             <select
               value={selectedStatus}
@@ -301,6 +281,7 @@ const StudentFeeTracker = () => {
             />
           </div>
 
+          {/* Students Fee Table */}
           <div className="overflow-x-auto">
             <table className="min-w-full bg-gray-700 text-white shadow-lg">
               <thead>
@@ -373,7 +354,7 @@ const StudentFeeTracker = () => {
             </table>
           </div>
 
-          {/* Edit Fee Modal */}
+          {/*-------------------------- Edit Fee Modal------------------------------ */}
           <Modal
             isOpen={modalOpen}
             onRequestClose={handleCloseModal}
@@ -390,7 +371,7 @@ const StudentFeeTracker = () => {
                   value={totalFee}
                   onChange={handleTotalFeeChange}
                   className="w-full p-2 border rounded-lg"
-                  min={amountReceived}
+                  min={amountReceived} // Ensure Total Fee cannot be less than Amount Received
                   aria-label="Total Fee"
                 />
               </div>
@@ -458,149 +439,9 @@ const StudentFeeTracker = () => {
               </div>
             </form>
           </Modal>
-
-          {/* New Fee Modal */}
-          <Modal
-            isOpen={newFeeModalOpen}
-            onRequestClose={handleCloseModal}
-            className="bg-white p-6 rounded-lg max-w-lg w-full text-black"
-            overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-          >
-            <h2 className="text-xl font-bold mb-4">New Fee Record</h2>
-            <form>
-              {/* Total Fee */}
-              <div className="mb-4">
-                <label className="block mb-2 text-gray-700">Total Fee:</label>
-                <input
-                  type="number"
-                  value={totalFee}
-                  onChange={handleTotalFeeChange}
-                  className="w-full p-2 border rounded-lg"
-                  min={amountReceived}
-                  aria-label="Total Fee"
-                />
-              </div>
-
-              {/* Amount Received */}
-              <div className="mb-4">
-                <label className="block mb-2 text-gray-700">
-                  Amount Received:
-                </label>
-                <input
-                  type="number"
-                  value={amountReceived}
-                  onChange={handleAmountReceivedChange}
-                  className="w-full p-2 border rounded-lg"
-                  min="0"
-                  max={totalFee}
-                  aria-label="Amount Received"
-                />
-              </div>
-
-              {/* Remaining Amount */}
-              <div className="mb-4">
-                <label className="block mb-2 text-gray-700">
-                  Remaining Amount:
-                </label>
-                <input
-                  type="text"
-                  value={`Rs: ${remainingAmount}`}
-                  disabled
-                  className="w-full p-2 border rounded-lg bg-gray-200"
-                  aria-label="Remaining Amount"
-                />
-              </div>
-
-              {/* Submission Date */}
-              <div className="mb-4">
-                <label className="block mb-2 text-gray-700">
-                  Submission Date:
-                </label>
-                <input
-                  type="date"
-                  value={submissionDate}
-                  onChange={(e) => setSubmissionDate(e.target.value)}
-                  className="w-full p-2 border rounded-lg"
-                  aria-label="Submission Date"
-                />
-              </div>
-
-              {/* Form Actions */}
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleNewFeeSubmit}
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg"
-                >
-                  Create
-                </button>
-              </div>
-            </form>
-          </Modal>
-
-          {/* Fee Records Table */}
-          <h2 className="text-2xl font-bold text-white mt-8 mb-4">
-            Fee Records
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-gray-700 text-white shadow-lg">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 text-left">Student Name</th>
-                  <th className="py-2 px-4 text-left">Roll Number</th>
-                  <th className="py-2 px-4 text-left">Grade</th>
-                  <th className="py-2 px-4 text-left">Total Fee (Rs:)</th>
-                  <th className="py-2 px-4 text-left">Amount Paid (Rs:)</th>
-                  <th className="py-2 px-4 text-left">
-                    Remaining Amount (Rs:)
-                  </th>
-                  <th className="py-2 px-4 text-left">Submission Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {feeRecords.length > 0 ? (
-                  feeRecords.map((record) => (
-                    <tr
-                      key={record.id}
-                      className="bg-gray-800 hover:bg-gray-700 transition-colors duration-200"
-                    >
-                      <td className="py-2 px-4">{record.studentName}</td>
-                      <td className="py-2 px-4">{record.rollNumber}</td>
-                      <td className="py-2 px-4">{record.grade}</td>
-                      <td className="py-2 px-4">Rs: {record.totalFee}</td>
-                      <td className="py-2 px-4">Rs: {record.amountPaid}</td>
-                      <td className="py-2 px-4">
-                        Rs: {record.remainingAmount}
-                      </td>
-                      <td className="py-2 px-4">
-                        {record.submissionDate
-                          ? new Date(record.submissionDate).toLocaleDateString()
-                          : "N/A"}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan="7"
-                      className="py-4 px-4 text-center text-gray-400"
-                    >
-                      No fee records found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
         </>
       ) : (
+        // Only render PrintSlip if printSlipData is available
         printSlipData && (
           <PrintSlip
             selectedStudent={selectedStudent}

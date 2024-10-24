@@ -23,6 +23,8 @@ export const AdminAddStudent = () => {
     studentAvatar: null,
     studentIdCardCopy: null,
     studentFee: "",
+    amountPaid: "", // New field
+    submissionDate: "", // New field
   });
 
   const [courses, setCourses] = useState([]);
@@ -33,12 +35,12 @@ export const AdminAddStudent = () => {
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
-
   const [show, setShow] = useState(true);
 
   const handleShow = () => {
     setShow(!show);
   };
+
   useEffect(() => {
     const fetchAllGrades = async () => {
       try {
@@ -119,7 +121,10 @@ export const AdminAddStudent = () => {
       studentId,
       studentIdCardNumber,
       studentFee,
+      amountPaid, // Include amountPaid
+      submissionDate, // Include submissionDate
     } = formData;
+
     const data = {
       studentName,
       studentEmail,
@@ -131,6 +136,8 @@ export const AdminAddStudent = () => {
       studentGrades: selectedGrades.map((grade) => ({ gradeId: grade })),
       studentCourses: selectedCourses.map((course) => ({ courseId: course })),
       studentFee,
+      amountPaid, // Include amountPaid
+      submissionDate, // Include submissionDate
     };
 
     try {
@@ -151,6 +158,8 @@ export const AdminAddStudent = () => {
         studentAvatar: null,
         studentIdCardCopy: null,
         studentFee: "",
+        amountPaid: "", // Reset field
+        submissionDate: "", // Reset field
       });
       setSelectedGrades([]);
       setSelectedCourses([]);
@@ -188,6 +197,8 @@ export const AdminAddStudent = () => {
       studentAvatar: null,
       studentIdCardCopy: null,
       studentFee: "",
+      amountPaid: "", // Reset field for editing
+      submissionDate: "", // Reset field for editing
     });
     setSelectedGrades(student?.studentGrades.map((g) => g.gradeId) || []);
     setSelectedCourses(student?.studentCourses.map((c) => c.courseId) || []);
@@ -260,16 +271,16 @@ export const AdminAddStudent = () => {
               <td className="px-6 py-4 text-sm text-gray-500">
                 {student.studentId}
               </td>
-              <td className="px-6 py-4 text-sm font-medium">
+              <td className="px-6 py-4 text-sm text-gray-500 flex space-x-2">
                 <button
                   onClick={() => openModal(student)}
-                  className="text-blue-600 bg-white hover:text-blue-900"
+                  className="text-blue-600 hover:text-blue-900"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(student._id)}
-                  className="text-red-600 bg-white hover:text-red-900 ml-2"
+                  className="text-red-600 hover:text-red-900"
                 >
                   Delete
                 </button>
@@ -293,7 +304,7 @@ export const AdminAddStudent = () => {
               htmlFor="studentName"
               className="block text-sm font-medium text-gray-700"
             >
-              Name
+              Student Name
             </label>
             <input
               type="text"
@@ -309,7 +320,7 @@ export const AdminAddStudent = () => {
               htmlFor="studentEmail"
               className="block text-sm font-medium text-gray-700"
             >
-              Email
+              Student Email
             </label>
             <input
               type="email"
@@ -320,26 +331,29 @@ export const AdminAddStudent = () => {
               className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-          <div className="mb-4 relative">
+          <div className="mb-4">
             <label
               htmlFor="studentPassword"
               className="block text-sm font-medium text-gray-700"
             >
               Password
             </label>
-            <input
-              type={show ? "password" : "text"}
-              name="studentPassword"
-              id="studentPassword"
-              value={formData.studentPassword}
-              onChange={handleInputChange}
-              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            />
-            <div
-              className="absolute right-2 bottom-3 cursor-pointer text-black"
-              onClick={handleShow}
-            >
-              {show ? <FaEyeSlash /> : <FaEye />}
+            <div className="relative">
+              <input
+                type={show ? "password" : "text"}
+                name="studentPassword"
+                id="studentPassword"
+                value={formData.studentPassword}
+                onChange={handleInputChange}
+                className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              />
+              <button
+                type="button"
+                onClick={handleShow}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2"
+              >
+                {show ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
           </div>
           <div className="mb-4">
@@ -347,7 +361,7 @@ export const AdminAddStudent = () => {
               htmlFor="studentId"
               className="block text-sm font-medium text-gray-700"
             >
-              ID
+              Student ID
             </label>
             <input
               type="text"
@@ -401,10 +415,57 @@ export const AdminAddStudent = () => {
               name="studentIdCardCopy"
               id="studentIdCardCopy"
               onChange={handleFileChange}
-              className="text-black  mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
+          <div className="mb-4">
+            <label
+              htmlFor="studentFee"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Fee
+            </label>
+            <input
+              type="text"
+              name="studentFee"
+              id="studentFee"
+              value={formData.studentFee}
+              onChange={handleInputChange}
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="amountPaid"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Amount Paid
+            </label>
+            <input
+              type="number"
+              name="amountPaid"
+              id="amountPaid"
+              value={formData.amountPaid}
+              onChange={handleInputChange}
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="submissionDate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Submission Date
+            </label>
+            <input
+              type="date"
+              name="submissionDate"
+              id="submissionDate"
+              value={formData.submissionDate}
+              onChange={handleInputChange}
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
           <div className="mb-4">
             <label
               htmlFor="grades"
@@ -416,165 +477,89 @@ export const AdminAddStudent = () => {
               name="grades"
               id="grades"
               onChange={handleSelectChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             >
+              <option value="">Select a grade</option>
               {grades.map((grade) => (
                 <option
                   key={grade._id}
-                  className=""
-                  value={JSON.stringify({
-                    gradeId: grade._id,
-                    gradeCategory: grade.gradeCategory,
-                  })}
+                  value={JSON.stringify({ gradeId: grade._id })}
                 >
-                  {grade.gradeCategory}
+                  {grade.gradeName}
                 </option>
               ))}
             </select>
-            <div className="mt-2 flex flex-wrap">
-              {selectedGrades.map((gradeId) => {
-                const grade = grades.find((g) => g._id === gradeId);
-                return (
-                  <span
-                    key={gradeId}
-                    className="inline-block bg-white text-black rounded-full px-3 py-1 text-sm font-semibold  mr-2 mb-2"
+            <div>
+              {selectedGrades.map((gradeId) => (
+                <span
+                  key={gradeId}
+                  className="inline-block bg-green-200 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded"
+                >
+                  {grades.find((grade) => grade._id === gradeId)?.gradeName}
+                  <button
+                    onClick={() => removeSelection(gradeId, "grades")}
+                    className="ml-1 text-red-600 hover:text-red-900"
                   >
-                    {grade.gradeCategory}{" "}
-                    <button
-                      type="button"
-                      onClick={() => removeSelection(gradeId, "grades")}
-                      className="text-red-500 ml-2"
-                    >
-                      x
-                    </button>
-                  </span>
-                );
-              })}
+                    x
+                  </button>
+                </span>
+              ))}
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Grades
-            </label>
-            <select
-              name="grades"
-              onChange={handleSelectChange}
-              className="text-black p-2 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          <div className="mb-4">
+            <label
+              htmlFor="courses"
+              className="block text-sm font-medium text-gray-700"
             >
-              <option value="" disabled selected>
-                Select grades
-              </option>
-              {grades.map((grade) => (
-                <option
-                  key={grade._id}
-                  className=""
-                  value={JSON.stringify({
-                    gradeId: grade._id,
-                    gradeCategory: grade.gradeCategory,
-                  })}
-                >
-                  {grade.gradeCategory}
-                </option>
-              ))}
-            </select>
-            <div className="mt-2 flex flex-wrap">
-              {selectedGrades.map((gradeId) => {
-                const grade = grades.find((g) => g._id === gradeId);
-                return (
-                  <span
-                    key={gradeId}
-                    className="inline-block bg-white text-black rounded-full px-3 py-1 text-sm font-semibold  mr-2 mb-2"
-                  >
-                    {grade.gradeCategory}{" "}
-                    <button
-                      type="button"
-                      onClick={() => removeSelection(gradeId, "grades")}
-                      className="text-red-500 ml-2"
-                    >
-                      x
-                    </button>
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Courses
+              Select Courses
             </label>
             <select
               name="courses"
+              id="courses"
               onChange={handleSelectChange}
-              className="text-black p-2 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             >
-              <option value="" disabled selected>
-                Select courses
-              </option>
+              <option value="">Select a course</option>
               {courses.map((course) => (
                 <option
                   key={course._id}
-                  value={JSON.stringify({
-                    courseId: course._id,
-                    courseTitle: course.courseTitle,
-                  })}
+                  value={JSON.stringify({ courseId: course._id })}
                 >
-                  {course.courseTitle}
+                  {course.courseName}
                 </option>
               ))}
             </select>
-            <div className="mt-2 flex flex-wrap">
-              {selectedCourses.map((courseId) => {
-                const course = courses.find((c) => c._id === courseId);
-                return (
-                  <span
-                    key={courseId}
-                    className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+            <div>
+              {selectedCourses.map((courseId) => (
+                <span
+                  key={courseId}
+                  className="inline-block bg-blue-200 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded"
+                >
+                  {
+                    courses.find((course) => course._id === courseId)
+                      ?.courseName
+                  }
+                  <button
+                    onClick={() => removeSelection(courseId, "courses")}
+                    className="ml-1 text-red-600 hover:text-red-900"
                   >
-                    {course.courseTitle}{" "}
-                    <button
-                      type="button"
-                      onClick={() => removeSelection(courseId, "courses")}
-                      className="text-red-500 ml-2"
-                    >
-                      x
-                    </button>
-                  </span>
-                );
-              })}
+                    x
+                  </button>
+                </span>
+              ))}
             </div>
           </div>
-
-          <div className="mb-4">
-            <label
-              htmlFor="studentFee"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Student Fee
-            </label>
-            <input
-              type="number"
-              name="studentFee"
-              id="studentFee"
-              value={formData.studentFee}
-              onChange={handleInputChange}
-              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            />
-          </div>
-
-          <div className="text-center">
-            {loading ? (
-              <ThreeDotLoader />
-            ) : (
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-              >
-                {editingStudent ? "Update Student" : "Add Student"}
-              </button>
-            )}
+          <div className="flex justify-between">
             <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              {editingStudent ? "Update Student" : "Add Student"}
+            </button>
+            <button
+              type="button"
               onClick={() => setIsModalOpen(false)}
-              className="ml-2 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+              className="bg-gray-300 text-black px-4 py-2 rounded"
             >
               Cancel
             </button>
