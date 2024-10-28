@@ -236,7 +236,8 @@ function App() {
             element={
               isStudentAuthenticated ? <Stu /> : <StudentLogin />
             }
-            ></Route>
+            >
+            </Route>
 
 <Route
             path="/teachers"
@@ -417,13 +418,23 @@ function App() {
             <Route
               path="/teacher-take-attendance"
               element={
-                isTeacherAuthenticated ? (
+                isTeacherAuthenticated || isAdminAuthenticated ? (
                   <TeacherTakeAttendance />
                 ) : (
                   <TeacherLogin />
                 )
               }
             />
+            {/* <Route
+              path="/teacher-take-attendance"
+              element={
+                isAdminAuthenticated ? (
+                  <TeacherTakeAttendance />
+                ) : (
+                  <TeacherLogin />
+                )
+              }
+            /> */}
             <Route
               path="/teacher-view-attendance"
               element={
@@ -477,15 +488,19 @@ function App() {
             <Route
               path="/teacher-add-result"
               element={
-                isTeacherAuthenticated ? <TeacherAddResult /> : <TeacherLogin />
+                isTeacherAuthenticated || isAdminAuthenticated ? (
+                  <TeacherAddResult />
+                ) : (
+                  <TeacherLogin />
+                )
               }
             />
-            <Route
+            {/* <Route
               path="/teacher-add-result"
               element={
-                isTeacherAuthenticated ? <TeacherAddResult /> : <TeacherLogin />
+                isAdminAuthenticated ? <TeacherAddResult /> : <TeacherLogin />
               }
-            />
+            /> */}
             <Route
               path="/chat"
               element={username ? <Chat /> : <RegisterAndLoginForm />}

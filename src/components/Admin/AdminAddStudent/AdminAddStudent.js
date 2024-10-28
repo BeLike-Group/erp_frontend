@@ -466,87 +466,97 @@ export const AdminAddStudent = () => {
               className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-          <div className="mb-4">
-            <label
-              htmlFor="grades"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Select Grades
+          {/* grade */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Grades
             </label>
             <select
               name="grades"
-              id="grades"
               onChange={handleSelectChange}
-              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              className="text-black p-2 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              <option value="">Select a grade</option>
+              <option value="" disabled selected>
+                Select grades
+              </option>
               {grades.map((grade) => (
                 <option
                   key={grade._id}
-                  value={JSON.stringify({ gradeId: grade._id })}
+                  className=""
+                  value={JSON.stringify({
+                    gradeId: grade._id,
+                    gradeCategory: grade.gradeCategory,
+                  })}
                 >
-                  {grade.gradeName}
+                  {grade.gradeCategory}
                 </option>
               ))}
             </select>
-            <div>
-              {selectedGrades.map((gradeId) => (
-                <span
-                  key={gradeId}
-                  className="inline-block bg-green-200 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded"
-                >
-                  {grades.find((grade) => grade._id === gradeId)?.gradeName}
-                  <button
-                    onClick={() => removeSelection(gradeId, "grades")}
-                    className="ml-1 text-red-600 hover:text-red-900"
+            <div className="mt-2 flex flex-wrap">
+              {selectedGrades.map((gradeId) => {
+                const grade = grades.find((g) => g._id === gradeId);
+                return (
+                  <span
+                    key={gradeId}
+                    className="inline-block bg-white text-black rounded-full px-3 py-1 text-sm font-semibold  mr-2 mb-2"
                   >
-                    x
-                  </button>
-                </span>
-              ))}
+                    {grade.gradeCategory}{" "}
+                    <button
+                      type="button"
+                      onClick={() => removeSelection(gradeId, "grades")}
+                      className="text-red-500 ml-2"
+                    >
+                      x
+                    </button>
+                  </span>
+                );
+              })}
             </div>
           </div>
-          <div className="mb-4">
-            <label
-              htmlFor="courses"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Select Courses
+          {/* course */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Courses
             </label>
             <select
               name="courses"
-              id="courses"
               onChange={handleSelectChange}
-              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              className="text-black p-2 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              <option value="">Select a course</option>
+              <option value="" disabled selected>
+                Select courses
+              </option>
               {courses.map((course) => (
                 <option
                   key={course._id}
-                  value={JSON.stringify({ courseId: course._id })}
+                  value={JSON.stringify({
+                    courseId: course._id,
+                    courseTitle: course.courseTitle,
+                  })}
                 >
-                  {course.courseName}
+                  {course.courseTitle}
                 </option>
               ))}
             </select>
-            <div>
-              {selectedCourses.map((courseId) => (
-                <span
-                  key={courseId}
-                  className="inline-block bg-blue-200 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded"
-                >
-                  {
-                    courses.find((course) => course._id === courseId)
-                      ?.courseName
-                  }
-                  <button
-                    onClick={() => removeSelection(courseId, "courses")}
-                    className="ml-1 text-red-600 hover:text-red-900"
+            <div className="mt-2 flex flex-wrap">
+              {selectedCourses.map((courseId) => {
+                const course = courses.find((c) => c._id === courseId);
+                return (
+                  <span
+                    key={courseId}
+                    className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
                   >
-                    x
-                  </button>
-                </span>
-              ))}
+                    {course.courseTitle}{" "}
+                    <button
+                      type="button"
+                      onClick={() => removeSelection(courseId, "courses")}
+                      className="text-red-500 ml-2"
+                    >
+                      x
+                    </button>
+                  </span>
+                );
+              })}
             </div>
           </div>
           <div className="flex justify-between">

@@ -18,8 +18,11 @@ const TeacherAddResult = () => {
   const [studentId, setStudentId] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [courseId, setCourseId] = useState(null); // State to store courseId
-  const [courses, setCourses] = useState([]); // State to store courses for the selected student
+  const [courseId, setCourseId] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [testName, setTestName] = useState(""); // New state for test name
+  const [testType, setTestType] = useState(""); // New state for test type
+  const [totalMarks, setTotalMarks] = useState(""); // New state for total marks
 
   const {
     register,
@@ -28,43 +31,45 @@ const TeacherAddResult = () => {
     reset,
   } = useForm();
 
-  // Fetch students based on grade
+  // Fetch students based on grade and course
   useEffect(() => {
     dispatch(loadCurrentTeacherAction());
 
-    const loadSameGradeStudents = async () => {
-      if (grade) {
+    const loadSameGradeAndCourseStudents = async () => {
+      if (grade && courseId) {
         try {
           const response = await axios.get(
-            `/api/v1/teacher/load-students-with-grade/${grade}`
+            `/api/v1/teacher/load-students-with-grade/${grade}/${courseId}`
           );
           setStudents(response.data.students);
         } catch (error) {
           console.log(error.response.data.message);
         }
       } else {
-        setStudents([]); // Clear students if no grade is selected
+        setStudents([]);
       }
     };
 
-    loadSameGradeStudents();
-  }, [grade, dispatch]);
+    loadSameGradeAndCourseStudents();
+  }, [grade, courseId, dispatch]);
 
-  // Filter students based on grade and student ID input
+  // Filter students by grade, course, and student ID
   useEffect(() => {
     if (students.length > 0) {
       const filtered = students.filter((student) => {
         return (
           student.studentId &&
           (!grade || student.studentGrade._id === grade) &&
+          (!courseId ||
+            student.studentCourses.some((c) => c.courseId._id === courseId)) &&
           (!studentId || student.studentId.toString().includes(studentId))
         );
       });
       setFilteredStudents(filtered);
     } else {
-      setFilteredStudents([]); // Clear filtered students if no data available
+      setFilteredStudents([]);
     }
-  }, [grade, studentId, students]);
+  }, [grade, courseId, studentId, students]);
 
   const { currentTeacherData } = useSelector(
     (state) => state.currentTeacherData
@@ -73,13 +78,11 @@ const TeacherAddResult = () => {
   const openModal = async (student) => {
     setSelectedStudent(student);
     setModalIsOpen(true);
-    setCourseId(null); // Reset courseId when opening the modal
 
-    // Fetch courses for the selected student
     if (student.studentCourses) {
       setCourses(student.studentCourses);
       if (student.studentCourses.length > 0) {
-        setCourseId(student.studentCourses[0].courseId._id); // Set the default courseId
+        setCourseId(student.studentCourses[0].courseId._id);
       }
     }
   };
@@ -87,16 +90,14 @@ const TeacherAddResult = () => {
   const closeModal = () => {
     setModalIsOpen(false);
     setSelectedStudent(null);
-    setCourseId(null); // Reset courseId when closing the modal
     reset();
-    setCourses([]); // Clear courses when closing the modal
   };
 
   const onSubmit = async (data) => {
     const obtainedMarks = Number(data.obtainedMarks);
-    const totalMarks = Number(data.totalMarks);
+    const totalMarksValue = Number(data.totalMarks || totalMarks); // Use local state totalMarks if not filled in the form
 
-    if (obtainedMarks > totalMarks) {
+    if (obtainedMarks > totalMarksValue) {
       handleShowFailureToast(
         "Obtained marks must be less than or equal to total marks"
       );
@@ -108,9 +109,10 @@ const TeacherAddResult = () => {
         `/api/v1/teacher/create-result/${courseId}/${selectedStudent._id}/${grade}`,
         {
           resultObtainedNumber: obtainedMarks,
-          resultTotalMarks: totalMarks,
-          resultStatus: data.result, // true or false
-          testName: data.testName,
+          resultTotalMarks: totalMarksValue,
+          resultStatus: data.result,
+          testName: data.testName || testName, // Use local state testName if not filled in the form
+          testType: data.testType || testType,
         }
       );
       handleShowSuccessToast(response.data.message);
@@ -128,7 +130,7 @@ const TeacherAddResult = () => {
         ADD RESULT
       </h1>
 
-      {/* Grade Selector */}
+      {/* Grade, Course, and Search Fields with New Test Name and Total Marks Fields */}
       <div className="flex space-x-4 mb-4">
         <select
           name="grade"
@@ -143,12 +145,51 @@ const TeacherAddResult = () => {
           ))}
         </select>
 
-        {/* Input for Student ID */}
+        <select
+          name="course"
+          onChange={(e) => setCourseId(e.target.value)}
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
+        >
+          <option value="">Select Course</option>
+          {currentTeacherData?.teacher?.teacherCourses?.map((course) => (
+            <option key={course.courseId._id} value={course.courseId._id}>
+              {course.courseId.courseTitle}
+            </option>
+          ))}
+        </select>
+
         <input
           type="text"
           placeholder="Search by Student ID"
           value={studentId}
           onChange={(e) => setStudentId(e.target.value)}
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
+        />
+
+        <input
+          type="text"
+          placeholder="Test Name"
+          value={testName}
+          onChange={(e) => setTestName(e.target.value)}
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
+        />
+
+        <select
+          value={testType}
+          onChange={(e) => setTestType(e.target.value)}
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
+        >
+          <option value="">Select Test Type</option>
+          <option value="daily">Daily</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+
+        <input
+          type="number"
+          placeholder="Total Marks"
+          value={totalMarks}
+          onChange={(e) => setTotalMarks(e.target.value)}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
         />
       </div>
@@ -186,7 +227,9 @@ const TeacherAddResult = () => {
             </tbody>
           </table>
         ) : (
-          <p className="text-center text-red-500 font-bold">No Students Found</p>
+          <p className="text-center text-red-500 font-bold">
+            No Students Found
+          </p>
         )}
       </div>
 
@@ -225,10 +268,30 @@ const TeacherAddResult = () => {
               </label>
               <input
                 type="text"
-                {...register("testName", { required: true })}
+                {...register("testName")}
+                value={testName} // Display the state value
+                onChange={(e) => setTestName(e.target.value)} // Update state when input changes
                 className="w-full p-2 border rounded-lg"
               />
-              {errors.testName && <p className="text-red-500 text-xs">Test name is required</p>}
+              {errors.testName && (
+                <p className="text-red-500 text-xs">Test name is required</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Test Type
+              </label>
+              <input
+                type="text"
+                {...register("testType")}
+                value={testType} // Display the state value
+                onChange={(e) => setTestType(e.target.value)} // Update state when input changes
+                className="w-full p-2 border rounded-lg"
+              />
+              {errors.testType && (
+                <p className="text-red-500 text-xs">Test Type is required</p>
+              )}
             </div>
 
             <div className="mb-4">
@@ -237,12 +300,17 @@ const TeacherAddResult = () => {
               </label>
               <input
                 type="number"
-                {...register("totalMarks", { required: true })}
+                {...register("totalMarks")}
+                value={totalMarks} // Display the state value
+                onChange={(e) => setTotalMarks(e.target.value)} // Update state when input changes
                 className="w-full p-2 border rounded-lg"
               />
-              {errors.totalMarks && <p className="text-red-500 text-xs">Total Marks are required</p>}
+              {errors.totalMarks && (
+                <p className="text-red-500 text-xs">Total marks are required</p>
+              )}
             </div>
 
+            {/* The rest of your modal form remains unchanged */}
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Obtained Marks
@@ -252,7 +320,11 @@ const TeacherAddResult = () => {
                 {...register("obtainedMarks", { required: true })}
                 className="w-full p-2 border rounded-lg"
               />
-              {errors.obtainedMarks && <p className="text-red-500 text-xs">Obtained Marks are required</p>}
+              {errors.obtainedMarks && (
+                <p className="text-red-500 text-xs">
+                  Obtained Marks are required
+                </p>
+              )}
             </div>
 
             <div className="mb-4">
@@ -267,7 +339,11 @@ const TeacherAddResult = () => {
                 <option value={true}>Pass</option>
                 <option value={false}>Fail</option>
               </select>
-              {errors.result && <p className="text-red-500 text-xs">Result status is required</p>}
+              {errors.result && (
+                <p className="text-red-500 text-xs">
+                  Result status is required
+                </p>
+              )}
             </div>
 
             <div className="flex justify-between">
