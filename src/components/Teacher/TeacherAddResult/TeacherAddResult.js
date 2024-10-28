@@ -54,22 +54,18 @@ const TeacherAddResult = () => {
     loadSameGradeAndCourseStudents();
   }, [grade, courseId, dispatch]);
 
-  useEffect(() => {
-    if (students.length > 0) {
-      const filtered = students.filter((student) => {
-        return (
-          student.studentId &&
-          (!grade || student.studentGrade._id === grade) &&
-          (!courseId ||
-            student.studentCourses.some((c) => c.courseId._id === courseId)) &&
-          (!studentId || student.studentId.toString().includes(studentId))
-        );
-      });
-      setFilteredStudents(filtered);
-    } else {
-      setFilteredStudents([]);
-    }
-  }, [grade, courseId, studentId, students]);
+  const filterStudents = () => {
+    const filtered = students.filter((student) => {
+      return (
+        student.studentId &&
+        (!grade || student.studentGrade._id === grade) &&
+        (!courseId ||
+          student.studentCourses.some((c) => c.courseId._id === courseId)) &&
+        (!studentId || student.studentId.toString().includes(studentId))
+      );
+    });
+    setFilteredStudents(filtered);
+  };
 
   const { currentTeacherData } = useSelector(
     (state) => state.currentTeacherData
@@ -129,25 +125,16 @@ const TeacherAddResult = () => {
     const selectedGrade = currentTeacherData?.teacher?.teacherGrades.find(
       (g) => g.gradeId.gradeCategory === value
     );
-    if (selectedGrade) {
-      setGrade(selectedGrade.gradeId._id);
-    } else {
-      setGrade(null);
-    }
+    setGrade(selectedGrade ? selectedGrade.gradeId._id : null);
   };
 
   const handleCourseChange = (e) => {
     const value = e.target.value;
     setInputCourse(value);
-    // Optionally validate and set course based on available options
     const selectedCourse = currentTeacherData?.teacher?.teacherCourses.find(
       (c) => c.courseId.courseTitle === value
     );
-    if (selectedCourse) {
-      setCourseId(selectedCourse.courseId._id);
-    } else {
-      setCourseId(null);
-    }
+    setCourseId(selectedCourse ? selectedCourse.courseId._id : null);
   };
 
   return (
@@ -182,6 +169,13 @@ const TeacherAddResult = () => {
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
         />
 
+        <button
+          onClick={filterStudents}
+          className="bg-green-500 text-white px-4 py-2 rounded-lg"
+        >
+          Search
+        </button>
+
         <input
           type="text"
           placeholder="Test Name"
@@ -212,7 +206,7 @@ const TeacherAddResult = () => {
 
       {/* Students Table */}
       <div className="w-full lg:w-[90%]">
-        {filteredStudents?.length > 0 ? (
+        {filteredStudents.length > 0 ? (
           <table className="min-w-full bg-white text-center lg:rounded-md">
             <thead>
               <tr>
@@ -224,7 +218,7 @@ const TeacherAddResult = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredStudents?.map((student) => (
+              {filteredStudents.map((student) => (
                 <tr key={student?._id} className="text-center border-b">
                   <td className="py-2">{student.studentId}</td>
                   <td className="py-2">{student.studentName}</td>
@@ -259,7 +253,6 @@ const TeacherAddResult = () => {
         <div className="bg-white p-6 rounded-lg w-full max-w-lg">
           <h2 className="text-xl font-bold mb-4">Add Test Result</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* Existing modal form code remains unchanged */}
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Obtained Marks
