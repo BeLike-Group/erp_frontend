@@ -15,14 +15,16 @@ const TeacherAddResult = () => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [grade, setGrade] = useState(null);
+  const [inputGrade, setInputGrade] = useState("");
+  const [inputCourse, setInputCourse] = useState(""); // State for input course
   const [studentId, setStudentId] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [courseId, setCourseId] = useState(null);
   const [courses, setCourses] = useState([]);
-  const [testName, setTestName] = useState(""); // New state for test name
-  const [testType, setTestType] = useState(""); // New state for test type
-  const [totalMarks, setTotalMarks] = useState(""); // New state for total marks
+  const [testName, setTestName] = useState("");
+  const [testType, setTestType] = useState("");
+  const [totalMarks, setTotalMarks] = useState("");
 
   const {
     register,
@@ -31,7 +33,6 @@ const TeacherAddResult = () => {
     reset,
   } = useForm();
 
-  // Fetch students based on grade and course
   useEffect(() => {
     dispatch(loadCurrentTeacherAction());
 
@@ -53,7 +54,6 @@ const TeacherAddResult = () => {
     loadSameGradeAndCourseStudents();
   }, [grade, courseId, dispatch]);
 
-  // Filter students by grade, course, and student ID
   useEffect(() => {
     if (students.length > 0) {
       const filtered = students.filter((student) => {
@@ -95,7 +95,7 @@ const TeacherAddResult = () => {
 
   const onSubmit = async (data) => {
     const obtainedMarks = Number(data.obtainedMarks);
-    const totalMarksValue = Number(data.totalMarks || totalMarks); // Use local state totalMarks if not filled in the form
+    const totalMarksValue = Number(data.totalMarks || totalMarks);
 
     if (obtainedMarks > totalMarksValue) {
       handleShowFailureToast(
@@ -111,7 +111,7 @@ const TeacherAddResult = () => {
           resultObtainedNumber: obtainedMarks,
           resultTotalMarks: totalMarksValue,
           resultStatus: data.result,
-          testName: data.testName || testName, // Use local state testName if not filled in the form
+          testName: data.testName || testName,
           testType: data.testType || testType,
         }
       );
@@ -123,6 +123,33 @@ const TeacherAddResult = () => {
     }
   };
 
+  const handleGradeChange = (e) => {
+    const value = e.target.value;
+    setInputGrade(value);
+    const selectedGrade = currentTeacherData?.teacher?.teacherGrades.find(
+      (g) => g.gradeId.gradeCategory === value
+    );
+    if (selectedGrade) {
+      setGrade(selectedGrade.gradeId._id);
+    } else {
+      setGrade(null);
+    }
+  };
+
+  const handleCourseChange = (e) => {
+    const value = e.target.value;
+    setInputCourse(value);
+    // Optionally validate and set course based on available options
+    const selectedCourse = currentTeacherData?.teacher?.teacherCourses.find(
+      (c) => c.courseId.courseTitle === value
+    );
+    if (selectedCourse) {
+      setCourseId(selectedCourse.courseId._id);
+    } else {
+      setCourseId(null);
+    }
+  };
+
   return (
     <div className="h-screen w-screen flex flex-col justify-start items-center text-black py-4">
       <Toaster />
@@ -130,33 +157,22 @@ const TeacherAddResult = () => {
         ADD RESULT
       </h1>
 
-      {/* Grade, Course, and Search Fields with New Test Name and Total Marks Fields */}
+      {/* Grade, Course, and Search Fields */}
       <div className="flex space-x-4 mb-4">
-        <select
-          name="grade"
-          onChange={(e) => setGrade(e.target.value)}
+        <input
+          type="text"
+          placeholder="Enter or Select Grade"
+          value={inputGrade}
+          onChange={handleGradeChange}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
-        >
-          <option value="">Select Grade</option>
-          {currentTeacherData?.teacher?.teacherGrades?.map((grade) => (
-            <option key={grade.gradeId._id} value={grade.gradeId._id}>
-              {grade.gradeId.gradeCategory}
-            </option>
-          ))}
-        </select>
-
-        <select
-          name="course"
-          onChange={(e) => setCourseId(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Enter or Select Course"
+          value={inputCourse}
+          onChange={handleCourseChange}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
-        >
-          <option value="">Select Course</option>
-          {currentTeacherData?.teacher?.teacherCourses?.map((course) => (
-            <option key={course.courseId._id} value={course.courseId._id}>
-              {course.courseId.courseTitle}
-            </option>
-          ))}
-        </select>
+        />
 
         <input
           type="text"
@@ -243,74 +259,7 @@ const TeacherAddResult = () => {
         <div className="bg-white p-6 rounded-lg w-full max-w-lg">
           <h2 className="text-xl font-bold mb-4">Add Test Result</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* Dropdown for Course Selection */}
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Select Course
-              </label>
-              <select
-                value={courseId}
-                onChange={(e) => setCourseId(e.target.value)}
-                className="w-full p-2 border rounded-lg"
-              >
-                <option value="">Select Course</option>
-                {courses.map((course) => (
-                  <option key={course.courseId._id} value={course.courseId._id}>
-                    {course.courseId.courseTitle}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Test Name
-              </label>
-              <input
-                type="text"
-                {...register("testName")}
-                value={testName} // Display the state value
-                onChange={(e) => setTestName(e.target.value)} // Update state when input changes
-                className="w-full p-2 border rounded-lg"
-              />
-              {errors.testName && (
-                <p className="text-red-500 text-xs">Test name is required</p>
-              )}
-            </div>
-
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Test Type
-              </label>
-              <input
-                type="text"
-                {...register("testType")}
-                value={testType} // Display the state value
-                onChange={(e) => setTestType(e.target.value)} // Update state when input changes
-                className="w-full p-2 border rounded-lg"
-              />
-              {errors.testType && (
-                <p className="text-red-500 text-xs">Test Type is required</p>
-              )}
-            </div>
-
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Total Marks
-              </label>
-              <input
-                type="number"
-                {...register("totalMarks")}
-                value={totalMarks} // Display the state value
-                onChange={(e) => setTotalMarks(e.target.value)} // Update state when input changes
-                className="w-full p-2 border rounded-lg"
-              />
-              {errors.totalMarks && (
-                <p className="text-red-500 text-xs">Total marks are required</p>
-              )}
-            </div>
-
-            {/* The rest of your modal form remains unchanged */}
+            {/* Existing modal form code remains unchanged */}
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Obtained Marks
