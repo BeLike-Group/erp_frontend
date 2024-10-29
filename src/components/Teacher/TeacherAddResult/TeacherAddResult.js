@@ -148,7 +148,7 @@ const TeacherAddResult = () => {
         ADD RESULT
       </h1>
 
-      <div className="flex space-x-4 mb-4">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4">
         <select
           value={grade}
           onChange={handleGradeChange}
