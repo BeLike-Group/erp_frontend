@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSelector, useDispatch } from "react-redux";
-import loadCurrentTeacherAction from "../../Redux/Teacher/Actions/loadCurrentTeacherAction.Teacher";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
 import Modal from "react-modal";
@@ -11,20 +9,20 @@ import {
 } from "../../ToastMessages/ToastMessage";
 
 const TeacherAddResult = () => {
-  const dispatch = useDispatch();
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
-  const [grade, setGrade] = useState(null);
-  const [inputGrade, setInputGrade] = useState("");
-  const [inputCourse, setInputCourse] = useState(""); // State for input course
+  const [grade, setGrade] = useState("");
+  const [courseId, setCourseId] = useState("");
   const [studentId, setStudentId] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [courseId, setCourseId] = useState(null);
+  const [grades, setGrades] = useState([]);
   const [courses, setCourses] = useState([]);
   const [testName, setTestName] = useState("");
   const [testType, setTestType] = useState("");
   const [totalMarks, setTotalMarks] = useState("");
+  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [loadingStudents, setLoadingStudents] = useState(false);
 
   const {
     register,
@@ -33,53 +31,69 @@ const TeacherAddResult = () => {
     reset,
   } = useForm();
 
+  // Fetch grades and courses
   useEffect(() => {
-    dispatch(loadCurrentTeacherAction());
+    const fetchGradesAndCourses = async () => {
+      try {
+        const [gradesResponse, coursesResponse] = await Promise.all([
+          axios.get("/api/v1/admin/load-all-grades"),
+          axios.get("/api/v1/admin/load-all-courses"),
+        ]);
+        setGrades(gradesResponse.data.grades);
+        setCourses(coursesResponse.data.courses);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoadingCourses(false); // End loading courses
+      }
+    };
 
-    const loadSameGradeAndCourseStudents = async () => {
+    fetchGradesAndCourses();
+  }, []);
+
+  // Load students based on grade and course selection
+  useEffect(() => {
+    const loadStudents = async () => {
       if (grade && courseId) {
+        setLoadingStudents(true); // Start loading students
         try {
           const response = await axios.get(
             `/api/v1/teacher/load-students-with-grade/${grade}/${courseId}`
           );
           setStudents(response.data.students);
+          setFilteredStudents(response.data.students);
         } catch (error) {
           console.log(error.response.data.message);
+        } finally {
+          setLoadingStudents(false); // End loading students
         }
       } else {
         setStudents([]);
+        setFilteredStudents([]);
       }
     };
 
-    loadSameGradeAndCourseStudents();
-  }, [grade, courseId, dispatch]);
+    loadStudents();
+  }, [grade, courseId]);
 
   const filterStudents = () => {
     const filtered = students.filter((student) => {
-      return (
-        student.studentId &&
-        (!grade || student.studentGrade._id === grade) &&
-        (!courseId ||
-          student.studentCourses.some((c) => c.courseId._id === courseId)) &&
-        (!studentId || student.studentId.toString().includes(studentId))
-      );
+      const matchesGrade = !grade || student.studentGrade._id === grade;
+      const matchesCourse =
+        !courseId ||
+        student.studentCourses.some((c) => c.courseId._id === courseId);
+      const matchesStudentId =
+        !studentId || student.studentId.toString().includes(studentId);
+      return matchesGrade && matchesCourse && matchesStudentId;
     });
     setFilteredStudents(filtered);
   };
 
-  const { currentTeacherData } = useSelector(
-    (state) => state.currentTeacherData
-  );
-
-  const openModal = async (student) => {
+  const openModal = (student) => {
     setSelectedStudent(student);
     setModalIsOpen(true);
-
-    if (student.studentCourses) {
-      setCourses(student.studentCourses);
-      if (student.studentCourses.length > 0) {
-        setCourseId(student.studentCourses[0].courseId._id);
-      }
+    if (student.studentCourses && student.studentCourses.length > 0) {
+      setCourseId(student.studentCourses[0].courseId._id);
     }
   };
 
@@ -120,21 +134,11 @@ const TeacherAddResult = () => {
   };
 
   const handleGradeChange = (e) => {
-    const value = e.target.value;
-    setInputGrade(value);
-    const selectedGrade = currentTeacherData?.teacher?.teacherGrades.find(
-      (g) => g.gradeId.gradeCategory === value
-    );
-    setGrade(selectedGrade ? selectedGrade.gradeId._id : null);
+    setGrade(e.target.value);
   };
 
   const handleCourseChange = (e) => {
-    const value = e.target.value;
-    setInputCourse(value);
-    const selectedCourse = currentTeacherData?.teacher?.teacherCourses.find(
-      (c) => c.courseId.courseTitle === value
-    );
-    setCourseId(selectedCourse ? selectedCourse.courseId._id : null);
+    setCourseId(e.target.value);
   };
 
   return (
@@ -144,22 +148,33 @@ const TeacherAddResult = () => {
         ADD RESULT
       </h1>
 
-      {/* Grade, Course, and Search Fields */}
       <div className="flex space-x-4 mb-4">
-        <input
-          type="text"
-          placeholder="Enter or Select Grade"
-          value={inputGrade}
+        <select
+          value={grade}
           onChange={handleGradeChange}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
-        />
-        <input
-          type="text"
-          placeholder="Enter or Select Course"
-          value={inputCourse}
+        >
+          <option value="">Select Grade</option>
+          {grades.map((grade) => (
+            <option key={grade._id} value={grade._id}>
+              {grade.gradeCategory}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={courseId}
           onChange={handleCourseChange}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
-        />
+        >
+          <option value="">Select Course</option>
+
+          {courses.map((course) => (
+            <option key={course._id} value={course._id}>
+              {course.courseTitle}
+            </option>
+          ))}
+        </select>
 
         <input
           type="text"
@@ -168,7 +183,6 @@ const TeacherAddResult = () => {
           onChange={(e) => setStudentId(e.target.value)}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
         />
-
         <button
           onClick={filterStudents}
           className="bg-green-500 text-white px-4 py-2 rounded-lg"
@@ -204,7 +218,6 @@ const TeacherAddResult = () => {
         />
       </div>
 
-      {/* Students Table */}
       <div className="w-full lg:w-[90%]">
         {filteredStudents.length > 0 ? (
           <table className="min-w-full bg-white text-center lg:rounded-md">
@@ -243,7 +256,6 @@ const TeacherAddResult = () => {
         )}
       </div>
 
-      {/* Modal for Adding Result */}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
