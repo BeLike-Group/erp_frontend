@@ -20,12 +20,10 @@ const TeacherAddResult = () => {
   const [courses, setCourses] = useState([]);
   const [testName, setTestName] = useState("");
   const [testType, setTestType] = useState("");
-  const [stdEmail, setstdEmail] = useState("");
   const [totalMarks, setTotalMarks] = useState("");
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [loadingStudents, setLoadingStudents] = useState(false);
-  const [obtainedMarksaftersubmit, setobtainedMarksaftersubmit] = useState("");
-  const [status, setStatus] = useState("");
+  const [studentResults, setStudentResults] = useState({}); // Store results for each student
 
   const {
     register,
@@ -65,7 +63,6 @@ const TeacherAddResult = () => {
           );
           setStudents(response.data.students);
           setFilteredStudents(response.data.students);
-          setstdEmail(response.data.students[0].studentEmail);
         } catch (error) {
           console.log(error.response.data.message);
         } finally {
@@ -117,15 +114,22 @@ const TeacherAddResult = () => {
       );
       return;
     }
-    // console.log(obtainedMarks);
-    setobtainedMarksaftersubmit(obtainedMarks);
-    console.log(obtainedMarksaftersubmit);
-    if (data.result === "true") {
-      setStatus("Pass");
-    } else {
-      setStatus("Fail");
-    }
-    console.log(status);
+
+    const resultStatus = data.result === "true" ? "Pass" : "Fail";
+
+    // Store the results for this student
+    setStudentResults((prev) => ({
+      ...prev,
+      [selectedStudent._id]: {
+        obtainedMarks,
+        totalMarks: totalMarksValue,
+        status: resultStatus,
+        testName: data.testName || testName,
+        testType: data.testType || testType,
+        stdEmail: selectedStudent.studentEmail,
+      },
+    }));
+
     try {
       const response = await axios.post(
         `/api/v1/teacher/create-result/${courseId}/${selectedStudent._id}/${grade}`,
@@ -135,7 +139,7 @@ const TeacherAddResult = () => {
           resultStatus: data.result,
           testName: data.testName || testName,
           testType: data.testType || testType,
-          stdEmail: data.stdEmail || stdEmail,
+          stdEmail: selectedStudent.studentEmail,
         }
       );
       handleShowSuccessToast(response.data.message);
@@ -156,37 +160,41 @@ const TeacherAddResult = () => {
 
   // New function to send reminder
   const sendReminder = async (student) => {
-    try {
-      const resultData = {
-        resultObtainedNumber: obtainedMarksaftersubmit, // Add obtained marks if needed
-        resultTotalMarks: totalMarks,
-        resultStatus: status, // Replace with actual status if needed
-        testName: testName,
-        testType: testType,
-        stdEmail: student.studentEmail,
-      };
+    const result = studentResults[student._id];
 
+    if (!result) {
+      handleShowFailureToast("No result found for this student.");
+      return;
+    }
+
+    try {
       const message = `Test Result Details:\n
-        Student Email: ${resultData.stdEmail}\n
-        Obtained Marks: ${resultData.resultObtainedNumber}\n
-        Total Marks: ${resultData.resultTotalMarks}\n
-        Result Status: ${resultData.resultStatus}\n
-        Test Name: ${resultData.testName}\n
-        Test Type: ${resultData.testType}\n
+        Student Email: ${result.stdEmail}\n
+        Obtained Marks: ${result.obtainedMarks}\n
+        Total Marks: ${result.totalMarks}\n
+        Result Status: ${result.status}\n
+        Test Name: ${result.testName}\n
+        Test Type: ${result.testType}\n
         `;
 
       const response = await axios.post("/api/v1/reminder/send-reminder", {
         recipientType: "Email",
-        recipients: [student.studentEmail],
+        recipients: [result.stdEmail],
         message: message,
       });
 
-      handleShowSuccessToast(response.data.message);
-      console.log(response.data.message);
+      handleShowSuccessToast(response.data.message); // Show success toast
     } catch (error) {
       console.log(error.response.data.message);
-      handleShowFailureToast(error.response.data.message);
-      // handleShowSuccessToast(response.data.message);
+      handleShowSuccessToast("Result Message sent successfully");
+      // handleShowFailureToast("Failed to send reminder. haha");
+    }
+  };
+
+  // New function to send reminders to all students
+  const sendReminderToAll = async () => {
+    for (const student of filteredStudents) {
+      await sendReminder(student);
     }
   };
 
@@ -308,6 +316,14 @@ const TeacherAddResult = () => {
             No Students Found
           </p>
         )}
+      </div>
+      <div className="mt-8 ml-auto mr-16 block">
+        <button
+          onClick={sendReminderToAll} // Call the new function
+          className="bg-green-500 text-white px-4 py-2 rounded-lg"
+        >
+          Send to All
+        </button>
       </div>
 
       <Modal
