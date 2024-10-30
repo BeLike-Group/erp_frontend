@@ -22,6 +22,7 @@ const TeacherTakeAttendance = () => {
         const response = await axios.get(
           "/api/v1/teacher/load-all-students-same-grade"
         );
+        console.log(response.data.studentsSameGrade);
         setAllStudents(response.data.studentsSameGrade);
         setAttendance(
           response.data.studentsSameGrade.map((student) => ({
@@ -46,6 +47,7 @@ const TeacherTakeAttendance = () => {
           const response = await axios.get(
             "/api/v1/teacher/view-grade-attendance"
           );
+          // console.log(response);
           setViewGradeAttendance(response.data.gradeStudentsAttendance);
         } catch (error) {
           console.log(error.response.data.message);
@@ -83,10 +85,18 @@ const TeacherTakeAttendance = () => {
       )
     );
   };
+  // console.log(
+  //   currentTeacherData.teacher.teacherGrades[0].gradeId.gradeCategory
+  // );
   const customGetMonth = (date) => {
     return new Date(date).getMonth() + 1;
   };
   console.log(currentTeacherData);
+  // console.dir(currentTeacherData.teacher.teacherGrades[0]);
+  console.log(
+    currentTeacherData.teacher.teacherGrades[0].gradeId.gradeCategory
+  );
+  // teacher.teacherGrades[0].gradeId.gradeCategory
   return (
     <div className="h-[100vh] xl:mx-8">
       <div className="grid grid-cols-6 h-full">
@@ -99,7 +109,7 @@ const TeacherTakeAttendance = () => {
                   <h1 className="text-2xl font-bold">
                     Grade{" "}
                     {
-                      currentTeacherData?.teacher?.teacherGradeIncharge
+                      currentTeacherData?.teacher?.teacherGrades[0]?.gradeId
                         ?.gradeCategory
                     }
                   </h1>
@@ -119,19 +129,19 @@ const TeacherTakeAttendance = () => {
                         </th>
                         <th>Today's Attendance</th>
                         {viewGradeAttendance &&
-                          Array.isArray(viewGradeAttendance)
+                        Array.isArray(viewGradeAttendance)
                           ? viewGradeAttendance.map((attendance) => (
-                            <th>
-                              L#{attendance.attendanceLecture} <br />{" "}
-                              {new Date(attendance.attendanceDate).getDate() +
-                                "-" +
-                                customGetMonth(attendance.attendanceDate) +
-                                "-" +
-                                new Date(
-                                  attendance.attendanceDate
-                                ).getFullYear()}
-                            </th>
-                          ))
+                              <th>
+                                L#{attendance.attendanceLecture} <br />{" "}
+                                {new Date(attendance.attendanceDate).getDate() +
+                                  "-" +
+                                  customGetMonth(attendance.attendanceDate) +
+                                  "-" +
+                                  new Date(
+                                    attendance.attendanceDate
+                                  ).getFullYear()}
+                              </th>
+                            ))
                           : ""}
                       </tr>
                     </thead>
@@ -140,8 +150,9 @@ const TeacherTakeAttendance = () => {
                         allStudents.map((student, studentIndex) => (
                           <tr
                             key={student?._id}
-                            className={`border-b dark:border-neutral-500 ${studentIndex % 2 === 0 ? "bg-gray-100" : ""
-                              }`}
+                            className={`border-b dark:border-neutral-500 ${
+                              studentIndex % 2 === 0 ? "bg-gray-100" : ""
+                            }`}
                           >
                             <td className="whitespace-nowrap px-6 py-4 font-medium">
                               {studentIndex + 1}

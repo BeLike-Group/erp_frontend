@@ -20,9 +20,12 @@ const TeacherAddResult = () => {
   const [courses, setCourses] = useState([]);
   const [testName, setTestName] = useState("");
   const [testType, setTestType] = useState("");
+  const [stdEmail, setstdEmail] = useState("");
   const [totalMarks, setTotalMarks] = useState("");
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [obtainedMarksaftersubmit, setobtainedMarksaftersubmit] = useState("");
+  const [status, setStatus] = useState("");
 
   const {
     register,
@@ -62,6 +65,7 @@ const TeacherAddResult = () => {
           );
           setStudents(response.data.students);
           setFilteredStudents(response.data.students);
+          setstdEmail(response.data.students[0].studentEmail);
         } catch (error) {
           console.log(error.response.data.message);
         } finally {
@@ -113,7 +117,15 @@ const TeacherAddResult = () => {
       );
       return;
     }
-
+    // console.log(obtainedMarks);
+    setobtainedMarksaftersubmit(obtainedMarks);
+    console.log(obtainedMarksaftersubmit);
+    if (data.result === "true") {
+      setStatus("Pass");
+    } else {
+      setStatus("Fail");
+    }
+    console.log(status);
     try {
       const response = await axios.post(
         `/api/v1/teacher/create-result/${courseId}/${selectedStudent._id}/${grade}`,
@@ -123,6 +135,7 @@ const TeacherAddResult = () => {
           resultStatus: data.result,
           testName: data.testName || testName,
           testType: data.testType || testType,
+          stdEmail: data.stdEmail || stdEmail,
         }
       );
       handleShowSuccessToast(response.data.message);
@@ -139,6 +152,42 @@ const TeacherAddResult = () => {
 
   const handleCourseChange = (e) => {
     setCourseId(e.target.value);
+  };
+
+  // New function to send reminder
+  const sendReminder = async (student) => {
+    try {
+      const resultData = {
+        resultObtainedNumber: obtainedMarksaftersubmit, // Add obtained marks if needed
+        resultTotalMarks: totalMarks,
+        resultStatus: status, // Replace with actual status if needed
+        testName: testName,
+        testType: testType,
+        stdEmail: student.studentEmail,
+      };
+
+      const message = `Test Result Details:\n
+        Student Email: ${resultData.stdEmail}\n
+        Obtained Marks: ${resultData.resultObtainedNumber}\n
+        Total Marks: ${resultData.resultTotalMarks}\n
+        Result Status: ${resultData.resultStatus}\n
+        Test Name: ${resultData.testName}\n
+        Test Type: ${resultData.testType}\n
+        `;
+
+      const response = await axios.post("/api/v1/reminder/send-reminder", {
+        recipientType: "Email",
+        recipients: [student.studentEmail],
+        message: message,
+      });
+
+      handleShowSuccessToast(response.data.message);
+      console.log(response.data.message);
+    } catch (error) {
+      console.log(error.response.data.message);
+      handleShowFailureToast(error.response.data.message);
+      // handleShowSuccessToast(response.data.message);
+    }
   };
 
   return (
@@ -168,7 +217,6 @@ const TeacherAddResult = () => {
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
         >
           <option value="">Select Course</option>
-
           {courses.map((course) => (
             <option key={course._id} value={course._id}>
               {course.courseTitle}
@@ -240,9 +288,15 @@ const TeacherAddResult = () => {
                   <td className="py-2">
                     <button
                       onClick={() => openModal(student)}
-                      className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                      className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
                     >
                       Add Test Result
+                    </button>
+                    <button
+                      onClick={() => sendReminder(student)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                    >
+                      Send
                     </button>
                   </td>
                 </tr>

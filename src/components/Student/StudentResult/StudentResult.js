@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import loadCurrentStudentAction from "../../Redux/Student/Actions/loadCurrentStudentAction.Student";
 
-
 export default function StudentResult() {
   const dispatch = useDispatch();
 
@@ -15,6 +14,7 @@ export default function StudentResult() {
   console.log(
     currentStudentData.currentStudent.studentResults[0].courseId.courseTitle
   );
+  console.log(currentStudentData.currentStudent.studentEmail);
   return (
     <div className="mt-4 flex flex-col justify-center items-center">
       <div className="w-[90%] md:w-[80%]">
@@ -43,6 +43,7 @@ export default function StudentResult() {
                       <th scope="col" className="px-6 py-4">
                         Percentage
                       </th>
+
                       <th scope="col" className="px-6 py-4">
                         Status
                       </th>
