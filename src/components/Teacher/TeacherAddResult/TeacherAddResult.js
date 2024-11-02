@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
-import Modal from "react-modal";
 import {
   handleShowFailureToast,
   handleShowSuccessToast,
@@ -14,8 +13,6 @@ const TeacherAddResult = () => {
   const [grade, setGrade] = useState("");
   const [courseId, setCourseId] = useState("");
   const [studentId, setStudentId] = useState("");
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
   const [grades, setGrades] = useState([]);
   const [courses, setCourses] = useState([]);
   const [testName, setTestName] = useState("");
@@ -23,16 +20,9 @@ const TeacherAddResult = () => {
   const [totalMarks, setTotalMarks] = useState("");
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [loadingStudents, setLoadingStudents] = useState(false);
-  const [studentResults, setStudentResults] = useState({}); // Store results for each student
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm();
+  const { handleSubmit, reset } = useForm();
 
-  // Fetch grades and courses
   useEffect(() => {
     const fetchGradesAndCourses = async () => {
       try {
@@ -45,18 +35,17 @@ const TeacherAddResult = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setLoadingCourses(false); // End loading courses
+        setLoadingCourses(false);
       }
     };
 
     fetchGradesAndCourses();
   }, []);
 
-  // Load students based on grade and course selection
   useEffect(() => {
     const loadStudents = async () => {
       if (grade && courseId) {
-        setLoadingStudents(true); // Start loading students
+        setLoadingStudents(true);
         try {
           const response = await axios.get(
             `/api/v1/teacher/load-students-with-grade/${grade}/${courseId}`
@@ -66,7 +55,7 @@ const TeacherAddResult = () => {
         } catch (error) {
           console.log(error.response.data.message);
         } finally {
-          setLoadingStudents(false); // End loading students
+          setLoadingStudents(false);
         }
       } else {
         setStudents([]);
@@ -90,64 +79,51 @@ const TeacherAddResult = () => {
     setFilteredStudents(filtered);
   };
 
-  const openModal = (student) => {
-    setSelectedStudent(student);
-    setModalIsOpen(true);
-    if (student.studentCourses && student.studentCourses.length > 0) {
-      setCourseId(student.studentCourses[0].courseId._id);
-    }
-  };
+  const onSubmit = async () => {
+    for (const student of filteredStudents) {
+      const obtainedMarks = Number(
+        document.getElementById(`obtainedMarks_${student._id}`).value
+      );
+      const totalMarksValue = Number(totalMarks);
+      const resultStatus = document.getElementById(
+        `result_${student._id}`
+      ).value;
 
-  const closeModal = () => {
-    setModalIsOpen(false);
-    setSelectedStudent(null);
+      if (
+        isNaN(obtainedMarks) ||
+        isNaN(totalMarksValue) ||
+        resultStatus === ""
+      ) {
+        handleShowFailureToast("All fields are required!");
+        continue;
+      }
+
+      if (obtainedMarks > totalMarksValue) {
+        handleShowFailureToast(
+          "Obtained marks must be less than or equal to total marks"
+        );
+        continue;
+      }
+
+      try {
+        const response = await axios.post(
+          `/api/v1/teacher/create-result/${courseId}/${student._id}/${grade}`,
+          {
+            resultObtainedNumber: obtainedMarks,
+            resultTotalMarks: totalMarksValue,
+            resultStatus, // directly use Boolean value
+            testName,
+            testType,
+            stdEmail: student.studentEmail,
+          }
+        );
+        handleShowSuccessToast(response.data.message);
+      } catch (error) {
+        console.log(error.response.data.message);
+        handleShowFailureToast(error.response.data.message);
+      }
+    }
     reset();
-  };
-
-  const onSubmit = async (data) => {
-    const obtainedMarks = Number(data.obtainedMarks);
-    const totalMarksValue = Number(data.totalMarks || totalMarks);
-
-    if (obtainedMarks > totalMarksValue) {
-      handleShowFailureToast(
-        "Obtained marks must be less than or equal to total marks"
-      );
-      return;
-    }
-
-    const resultStatus = data.result === "true" ? "Pass" : "Fail";
-
-    // Store the results for this student
-    setStudentResults((prev) => ({
-      ...prev,
-      [selectedStudent._id]: {
-        obtainedMarks,
-        totalMarks: totalMarksValue,
-        status: resultStatus,
-        testName: data.testName || testName,
-        testType: data.testType || testType,
-        stdEmail: selectedStudent.studentEmail,
-      },
-    }));
-
-    try {
-      const response = await axios.post(
-        `/api/v1/teacher/create-result/${courseId}/${selectedStudent._id}/${grade}`,
-        {
-          resultObtainedNumber: obtainedMarks,
-          resultTotalMarks: totalMarksValue,
-          resultStatus: data.result,
-          testName: data.testName || testName,
-          testType: data.testType || testType,
-          stdEmail: selectedStudent.studentEmail,
-        }
-      );
-      handleShowSuccessToast(response.data.message);
-      closeModal();
-    } catch (error) {
-      console.log(error.response.data.message);
-      handleShowFailureToast(error.response.data.message);
-    }
   };
 
   const handleGradeChange = (e) => {
@@ -158,43 +134,48 @@ const TeacherAddResult = () => {
     setCourseId(e.target.value);
   };
 
-  // New function to send reminder
   const sendReminder = async (student) => {
-    const result = studentResults[student._id];
-
-    if (!result) {
-      handleShowFailureToast("No result found for this student.");
-      return;
-    }
-
     try {
+      const result = {
+        stdEmail: student.studentEmail,
+        obtainedMarks: document.getElementById(`obtainedMarks_${student._id}`)
+          .value,
+        totalMarks,
+        status: document.getElementById(`result_${student._id}`).value,
+        testName,
+        testType,
+      };
       const message = `Test Result Details:\n
         Student Email: ${result.stdEmail}\n
         Obtained Marks: ${result.obtainedMarks}\n
         Total Marks: ${result.totalMarks}\n
         Result Status: ${result.status}\n
         Test Name: ${result.testName}\n
-        Test Type: ${result.testType}\n
-        `;
-
+        Test Type: ${result.testType}\n`;
       const response = await axios.post("/api/v1/reminder/send-reminder", {
         recipientType: "Email",
         recipients: [result.stdEmail],
         message: message,
       });
 
-      handleShowSuccessToast(response.data.message); // Show success toast
+      handleShowSuccessToast(response.data.message);
     } catch (error) {
       console.log(error.response.data.message);
-      handleShowSuccessToast("Result Message sent successfully");
-      // handleShowFailureToast("Failed to send reminder. haha");
+      handleShowFailureToast("Failed to send reminder.");
     }
   };
 
-  // New function to send reminders to all students
   const sendReminderToAll = async () => {
-    for (const student of filteredStudents) {
-      await sendReminder(student);
+    try {
+      // Execute all sendReminder calls concurrently using Promise.all
+      const reminderPromises = filteredStudents.map((student) =>
+        sendReminder(student)
+      );
+      await Promise.all(reminderPromises);
+      handleShowSuccessToast("Reminders sent to all students.");
+    } catch (error) {
+      console.error("Failed to send some reminders:", error);
+      handleShowFailureToast("Failed to send some reminders.");
     }
   };
 
@@ -279,115 +260,58 @@ const TeacherAddResult = () => {
           <table className="min-w-full bg-white text-center lg:rounded-md">
             <thead>
               <tr>
-                <th className="py-2">ID</th>
+                <th className="py-2">Student ID</th>
                 <th className="py-2">Student Name</th>
-                <th className="py-2">Email</th>
-                <th className="py-2">Grade</th>
-                <th className="py-2">Action</th>
+                <th className="py-2">Obtained Marks</th>
+                <th className="py-2">Total Marks</th>
+                <th className="py-2">Result Status</th>
               </tr>
             </thead>
             <tbody>
               {filteredStudents.map((student) => (
-                <tr key={student?._id} className="text-center border-b">
+                <tr key={student._id}>
                   <td className="py-2">{student.studentId}</td>
                   <td className="py-2">{student.studentName}</td>
-                  <td className="py-2">{student.studentEmail}</td>
-                  <td className="py-2">{student.studentGrade.gradeCategory}</td>
                   <td className="py-2">
-                    <button
-                      onClick={() => openModal(student)}
-                      className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
+                    <input
+                      id={`obtainedMarks_${student._id}`}
+                      type="number"
+                      placeholder="Obtained Marks"
+                      className="border border-gray-300 rounded p-1"
+                    />
+                  </td>
+                  <td className="py-2">{totalMarks}</td>
+                  <td className="py-2">
+                    <select
+                      id={`result_${student._id}`}
+                      className="border border-gray-300 rounded p-1"
                     >
-                      Add Test Result
-                    </button>
-                    <button
-                      onClick={() => sendReminder(student)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg"
-                    >
-                      Send
-                    </button>
+                      <option value="false">Fail</option>
+                      <option value="true">Pass</option>
+                    </select>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
-          <p className="text-center text-red-500 font-bold">
-            No Students Found
-          </p>
+          <p className="text-center">No students found.</p>
         )}
       </div>
-      <div className="mt-8 ml-auto mr-16 block">
-        <button
-          onClick={sendReminderToAll} // Call the new function
-          className="bg-green-500 text-white px-4 py-2 rounded-lg"
-        >
-          Send to All
-        </button>
-      </div>
 
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        className="fixed inset-0 flex items-center justify-center z-50 text-black"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+      <button
+        onClick={handleSubmit(onSubmit)}
+        className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-lg"
       >
-        <div className="bg-white p-6 rounded-lg w-full max-w-lg">
-          <h2 className="text-xl font-bold mb-4">Add Test Result</h2>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Obtained Marks
-              </label>
-              <input
-                type="number"
-                {...register("obtainedMarks", { required: true })}
-                className="w-full p-2 border rounded-lg"
-              />
-              {errors.obtainedMarks && (
-                <p className="text-red-500 text-xs">
-                  Obtained Marks are required
-                </p>
-              )}
-            </div>
+        Submit All Results
+      </button>
 
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Result Status
-              </label>
-              <select
-                {...register("result", { required: true })}
-                className="w-full p-2 border rounded-lg"
-              >
-                <option value="">Select Result Status</option>
-                <option value={true}>Pass</option>
-                <option value={false}>Fail</option>
-              </select>
-              {errors.result && (
-                <p className="text-red-500 text-xs">
-                  Result status is required
-                </p>
-              )}
-            </div>
-
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={closeModal}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-              >
-                Submit
-              </button>
-            </div>
-          </form>
-        </div>
-      </Modal>
+      <button
+        onClick={sendReminderToAll}
+        className="bg-yellow-500 text-white px-4 py-2 mt-4 ml-4 rounded-lg"
+      >
+        Send Reminders
+      </button>
     </div>
   );
 };
