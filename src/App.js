@@ -418,7 +418,7 @@ function App() {
             <Route
               path="/teacher-take-attendance"
               element={
-                isTeacherAuthenticated || isAdminAuthenticated ? (
+                isAdminAuthenticated || isTeacherAuthenticated ? (
                   <TeacherTakeAttendance />
                 ) : (
                   <TeacherLogin />

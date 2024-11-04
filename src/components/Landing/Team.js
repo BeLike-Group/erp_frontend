@@ -1,13 +1,12 @@
 import React from "react";
 import Bilal from "./Pics/team/Bilal.jpg";
 import Nazia from "./Pics/team/blankPic.jpg";
-import Mehek from "./Pics/team/blankPic.jpg";
-import Nabeel from "./Pics/team/Nabeel.jpg";
-import Minahil from "./Pics/team/blankPic.jpg";
-import Faheem from "./Pics/team/blankPic.jpg";
+import Mehek from "./Pics/team/Mehak.jpg";
+import Minahil from "./Pics/team/Minahil.jpg";
+import Faheem from "./Pics/team/Faheem.jpg";
 import Gms from "./Pics/team/GMS.jpg";
 import Usman from "./Pics/team/Usman.jpg"; // Usman (Product Manager)
-
+import Ahmad from "./Pics/team/Ahmad.jpg";
 // Array of team members
 const teamMembers = [
   {
@@ -26,9 +25,9 @@ const teamMembers = [
     image: Mehek,
   },
   {
-    name: "M.Nabeel",
+    name: "Minahil",
     role: "Institute Director",
-    image: Nabeel,
+    image: Minahil,
   },
   {
     name: "M.Usman",
@@ -36,14 +35,14 @@ const teamMembers = [
     image: Usman,
   },
   {
-    name: "Minahil",
-    role: "Coordinator Admin",
-    image: Minahil,
-  },
-  {
     name: "Faheem Shaikh",
     role: "Legal Advisor",
     image: Faheem,
+  },
+  {
+    name: "Ahmad Usman",
+    role: "County project director",
+    image: Ahmad,
   },
   {
     name: "Ghulam Murtaza Sani",

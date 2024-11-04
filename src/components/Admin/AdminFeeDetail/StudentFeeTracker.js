@@ -25,7 +25,7 @@ const StudentFeeTracker = () => {
   const [rollNumber, setRollNumber] = useState("");
   const [showPrintSlip, setShowPrintSlip] = useState(false); // State to control PrintSlip display
   const [printSlipData, setPrintSlipData] = useState(null); // Separate state for PrintSlip data
-
+  // const [studentsemail, setStudentEmail] = useState([]);
   // Fetch students data from the backend
   useEffect(() => {
     const fetchAllTransactions = async () => {
@@ -33,6 +33,14 @@ const StudentFeeTracker = () => {
         const response = await axios.get("/api/v1/admin/load-all-students");
         const studentsData = response?.data?.students || [];
 
+        // const emails = response?.data?.students.map(
+        //   (student) => student.studentEmail
+        // );
+        // console.log(emails);
+        // setStudentEmail(emails);
+        // console.log(studentsemail);
+
+        console.log(studentsData);
         // Calculate remaining amount based on total fee and amount paid
         const studentsWithRemaining = studentsData.map((student) => {
           const totalFee = student.studentFee;
@@ -132,7 +140,42 @@ const StudentFeeTracker = () => {
     setRemainingAmount(calculatedRemaining >= 0 ? calculatedRemaining : 0);
   };
 
-  // Handle submitting the fee
+  // // Send Reminder
+  // const sendReminder = async (student) => {
+  //   // fee.studentEmail  studentName
+  //   try {
+  //     const result = {
+  //       studentId: student.studentId,
+  //       studentEmail: student.studentEmail,
+  //       studentName: student.studentName,
+  //       studentFee: student.studentFee,
+  //       amountPaid: student.amountPaid,
+  //       remainingAmount: student.studentFee - student.amountPaid,
+  //       submissionDate: student.submissionDate,
+  //     };
+  //     const message = `Fee Details:\n
+  //     Student ID : ${result.studentId}\n
+  //       Student Email: ${result.studentEmail}\n
+  //       Student Name: ${result.studentName}\n
+  //       Student Fee: ${result.studentFee}\n
+  //       Amount Paid : ${result.amountPaid}\n
+  //       Remaining Amount : ${result.remainingAmount}\n
+  //       Submission Date : ${result.submissionDate}\n
+  //       Kindly Submit your Fee on Time`;
+
+  //     await axios.post("/api/v1/reminder/send-reminder", {
+  //       recipientType: "Email",
+  //       recipients: [result.studentEmail],
+  //       message: message,
+  //     });
+  //     handleShowSuccessToast("Reminder sent successfully.");
+  //   } catch (error) {
+  //     handleShowFailureToast(
+  //       error.response?.data?.message || "Failed to send reminder"
+  //     );
+  //   }
+  // };
+
   // Handle submitting the fee
   const handleSubmitFee = async () => {
     try {
@@ -225,6 +268,41 @@ const StudentFeeTracker = () => {
     }
   };
 
+  // Send Reminder
+  const sendReminder = async (student) => {
+    try {
+      const result = {
+        studentId: student.studentId,
+        studentEmail: student.studentEmail,
+        studentName: student.studentName,
+        studentFee: student.studentFee,
+        amountPaid: student.amountPaid,
+        remainingAmount: student.studentFee - student.amountPaid,
+        submissionDate: student.submissionDate,
+      };
+      const message = `Fee Details:\n
+      Student ID : ${result.studentId}\n
+        Student Email: ${result.studentEmail}\n
+        Student Name: ${result.studentName}\n
+        Student Fee: ${result.studentFee}\n
+        Amount Paid : ${result.amountPaid}\n
+        Remaining Amount : ${result.remainingAmount}\n
+        Submission Date : ${result.submissionDate}\n
+        Kindly Submit your Fee on Time`;
+
+      await axios.post("/api/v1/reminder/send-reminder", {
+        recipientType: "Email",
+        recipients: [result.studentEmail],
+        message: message,
+      });
+      handleShowSuccessToast("Reminder sent successfully.");
+    } catch (error) {
+      handleShowFailureToast(
+        error.response?.data?.message || "Failed to send reminder"
+      );
+    }
+  };
+
   // Handle completing the print slip process
   const handlePrintComplete = () => {
     // Hide PrintSlip and reset printSlipData and selectedStudent
@@ -293,6 +371,7 @@ const StudentFeeTracker = () => {
                   <th className="py-2 px-4 text-left">
                     Remaining Amount (Rs:)
                   </th>
+                  <th className="py-2 px-4 text-left">Email</th>
                   <th className="py-2 px-4 text-left">Submission Date</th>
                   <th className="py-2 px-4 text-left">Status</th>
                   <th className="py-2 px-4 text-left">Actions</th>
@@ -320,6 +399,7 @@ const StudentFeeTracker = () => {
                       >
                         Rs: {fee?.remainingAmount}
                       </td>
+                      <td className="py-2 px-4"> {fee?.studentEmail}</td>
                       <td className="py-2 px-4">
                         {fee?.submissionDate
                           ? new Date(fee?.submissionDate).toLocaleDateString()
@@ -330,12 +410,21 @@ const StudentFeeTracker = () => {
                           ? "Fully Paid"
                           : "Remaining"}
                       </td>
-                      <td className="py-2 px-4">
+                      <td className="py-2 px-4 flex gap-2">
                         <button
                           onClick={() => handleAddFeeClick(fee)}
-                          className="bg-blue-500 text-white px-2 py-1 rounded"
+                          className="bg-blue-500 text-white text-xs px-1 py-1 my-[0.30rem] rounded"
                         >
                           Edit Fee
+                        </button>
+                        <button
+                          onClick={() => {
+                            console.log("reminder send...");
+                            sendReminder(fee);
+                          }}
+                          className="bg-blue-500 text-white text-xs px-1 my-[0.30rem] py-1 rounded"
+                        >
+                          Send Reminder
                         </button>
                       </td>
                     </tr>
