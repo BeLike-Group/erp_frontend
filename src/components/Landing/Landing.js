@@ -47,7 +47,7 @@ const services = [
   {
     img: ecomimg,
     title: "Ecommerce",
-    link: "https://gregarious-fairy-be2043.netlify.app/",
+    link: "https://amazing-dango-36ea80.netlify.app/",
   },
   { img: jobimg, title: "Jobs", link: "/Job-portal-home" },
   {
