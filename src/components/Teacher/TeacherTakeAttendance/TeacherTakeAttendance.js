@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import loadCurrentTeacherAction from "../../Redux/Teacher/Actions/loadCurrentTeacherAction.Teacher";
 import axios from "axios";
 import {
   handleShowFailureToast,
@@ -8,74 +6,85 @@ import {
 } from "../../ToastMessages/ToastMessage";
 import { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import TeacherDashboard from "../TeacherDashboard";
+
 const TeacherTakeAttendance = () => {
-  const dispatch = useDispatch();
   const [attendance, setAttendance] = useState([]);
-  const [allStudents, setAllStudents] = useState(null);
-  const [viewGradeAttendance, setViewGradeAttendance] = useState(null);
+  const [allStudents, setAllStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [grades, setGrades] = useState([]);
+  const [gradeId, setGradeId] = useState(null);
   const navigate = useNavigate();
+
+  // Load all grades and students on component mount
   useEffect(() => {
-    dispatch(loadCurrentTeacherAction());
-    const loadAllGradeStudents = async () => {
+    const loadAllGrades = async () => {
       try {
-        const response = await axios.get(
-          "/api/v1/teacher/load-all-students-same-grade"
-        );
-        console.log(response.data.studentsSameGrade);
-        setAllStudents(response.data.studentsSameGrade);
-        setAttendance(
-          response.data.studentsSameGrade.map((student) => ({
-            studentId: student._id,
-            present: true,
-          }))
-        );
+        const response = await axios.get("/api/v1/admin/load-all-grades");
+        if (response.data && response.data.grades) {
+          setGrades(response.data.grades);
+          if (response.data.grades.length > 0) {
+            setGradeId(response.data.grades[0]._id);
+          }
+        }
       } catch (error) {
-        console.log(error.response.data.message);
+        console.error("Error loading grades:", error);
       }
     };
-    loadAllGradeStudents();
-  }, []);
-  const { currentTeacherData } = useSelector(
-    (state) => state.currentTeacherData
-  );
 
-  useEffect(() => {
-    if (currentTeacherData) {
-      const loadViewGradeAttendance = async () => {
-        try {
-          const response = await axios.get(
-            "/api/v1/teacher/view-grade-attendance"
-          );
-          // console.log(response);
-          setViewGradeAttendance(response.data.gradeStudentsAttendance);
-        } catch (error) {
-          console.log(error.response.data.message);
+    const loadAllStudents = async () => {
+      try {
+        const response = await axios.get("/api/v1/admin/load-all-students");
+        if (response.data && response.data.students) {
+          setAllStudents(response.data.students);
+          console.log("All students data:", response.data.students); // Log all students
         }
-      };
-      loadViewGradeAttendance();
-    }
-  }, [currentTeacherData]);
+      } catch (error) {
+        console.error("Error loading students:", error);
+      }
+    };
+
+    loadAllGrades();
+    loadAllStudents();
+  }, []);
+
+  const handleGradeChange = (e) => {
+    const selectedGradeCategory = e.target.value;
+
+    // Filter students based on the grade category
+    const studentsInGrade = allStudents.filter(
+      (student) => student.studentGrade?.gradeCategory === selectedGradeCategory
+    );
+
+    setFilteredStudents(studentsInGrade);
+    setAttendance(
+      studentsInGrade.map((student) => ({
+        studentId: student._id,
+        present: true,
+      }))
+    );
+
+    console.log("Selected Grade Category:", selectedGradeCategory);
+    console.log("Filtered Students:", studentsInGrade); // Log filtered students
+  };
+
   const sendDataToAttendanceApi = async () => {
-    if (attendance) {
-      const data = {
-        attendanceStudents: attendance,
-      };
+    if (attendance.length && gradeId) {
+      const data = { attendanceStudents: attendance };
       try {
         const response = await axios.post(
-          `/api/v1/teacher/take-attendance/${currentTeacherData?.teacher?.teacherGrades?.[0]?.gradeId?._id}`,
+          `/api/v1/teacher/take-attendance/${gradeId}`,
           data
         );
-        console.log(response.data.message);
         handleShowSuccessToast(response.data.message);
-        navigate("/teacher-view-attendance");
+        // navigate(`/teacher/view-grade-attendance`);
       } catch (error) {
-        console.log(error.response.data.message);
+        console.error("Error submitting attendance:", error);
       }
     } else {
-      handleShowFailureToast("Lecture Number input is missing");
+      handleShowFailureToast("Attendance data is missing.");
     }
   };
+
   const handleCheckBoxChange = (studentId) => {
     setAttendance((prevAttendance) =>
       prevAttendance.map((student) =>
@@ -85,37 +94,32 @@ const TeacherTakeAttendance = () => {
       )
     );
   };
-  // console.log(
-  //   currentTeacherData.teacher.teacherGrades[0].gradeId.gradeCategory
-  // );
-  const customGetMonth = (date) => {
-    return new Date(date).getMonth() + 1;
-  };
-  console.log(currentTeacherData);
-  // console.dir(currentTeacherData.teacher.teacherGrades[0]);
-  console.log(
-    currentTeacherData.teacher.teacherGrades[0].gradeId.gradeCategory
-  );
-  // teacher.teacherGrades[0].gradeId.gradeCategory
+
   return (
     <div className="h-[100vh] xl:mx-8">
       <div className="grid grid-cols-6 h-full">
         <Toaster />
-        <div className="col-span-5 ">
+        <div className="col-span-5">
           <div className="flex flex-col overflow-x-auto">
             <div className="sm:-mx-6 lg:-mx-8">
               <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
                 <div className="flex gap-8 m-10 items-center">
-                  <h1 className="text-2xl font-bold">
-                    Grade{" "}
-                    {
-                      currentTeacherData?.teacher?.teacherGrades[0]?.gradeId
-                        ?.gradeCategory
-                    }
-                  </h1>
+                  <h1 className="text-2xl font-bold">Grade Attendance</h1>
+                  <select
+                    value={gradeId || ""}
+                    onChange={handleGradeChange}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5"
+                  >
+                    <option value="">Select Grade</option>
+                    {grades.map((grade) => (
+                      <option key={grade._id} value={grade.gradeCategory}>
+                        {grade.gradeCategory || "Unnamed Grade"}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full text-left text-sm font-light text-black ">
+                  <table className="min-w-full text-left text-sm font-light text-black">
                     <thead className="border-b font-medium dark:border-neutral-500">
                       <tr className="text-white">
                         <th scope="col" className="px-6 py-4">
@@ -127,69 +131,42 @@ const TeacherTakeAttendance = () => {
                         <th scope="col" className="px-6 py-4">
                           Student Name
                         </th>
-                        <th>Today's Attendance</th>
-                        {viewGradeAttendance &&
-                        Array.isArray(viewGradeAttendance)
-                          ? viewGradeAttendance.map((attendance) => (
-                              <th>
-                                L#{attendance.attendanceLecture} <br />{" "}
-                                {new Date(attendance.attendanceDate).getDate() +
-                                  "-" +
-                                  customGetMonth(attendance.attendanceDate) +
-                                  "-" +
-                                  new Date(
-                                    attendance.attendanceDate
-                                  ).getFullYear()}
-                              </th>
-                            ))
-                          : ""}
+                        <th scope="col" className="px-6 py-4">
+                          Today's Attendance
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {allStudents &&
-                        allStudents.map((student, studentIndex) => (
-                          <tr
-                            key={student?._id}
-                            className={`border-b dark:border-neutral-500 ${
-                              studentIndex % 2 === 0 ? "bg-gray-100" : ""
-                            }`}
-                          >
-                            <td className="whitespace-nowrap px-6 py-4 font-medium">
-                              {studentIndex + 1}
-                            </td>
-                            <td className="whitespace-nowrap px-6 py-4">
-                              {student?.studentId}
-                            </td>
-                            <td className="whitespace-nowrap px-6 py-4">
-                              {student?.studentName}
-                            </td>
-                            <td className="whitespace-nowrap px-6 py-4">
-                              <input
-                                type="checkbox"
-                                className="w-10 h-4"
-                                onChange={() =>
-                                  handleCheckBoxChange(student?._id)
-                                }
-                                checked={
-                                  attendance.find(
-                                    (att) => att.studentId === student._id
-                                  )?.present
-                                }
-                              />
-                            </td>
-                            {viewGradeAttendance &&
-                              Array.isArray(viewGradeAttendance) &&
-                              viewGradeAttendance.map((attendance, index) => (
-                                <td key={index}>
-                                  {attendance.attendanceStudents.find(
-                                    (s) => s.studentId?._id === student._id
-                                  )?.present
-                                    ? "P"
-                                    : "A"}
-                                </td>
-                              ))}
-                          </tr>
-                        ))}
+                      {filteredStudents.map((student, index) => (
+                        <tr
+                          key={student._id}
+                          className={`border-b dark:border-neutral-500 ${
+                            index % 2 === 0 ? "bg-gray-100" : ""
+                          }`}
+                        >
+                          <td className="whitespace-nowrap px-6 py-4 font-medium">
+                            {index + 1}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4">
+                            {student.studentId}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4">
+                            {student.studentName || "N/A"}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4">
+                            <input
+                              type="checkbox"
+                              className="w-10 h-4"
+                              onChange={() => handleCheckBoxChange(student._id)}
+                              checked={
+                                attendance.find(
+                                  (att) => att.studentId === student._id
+                                )?.present
+                              }
+                            />
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -198,7 +175,7 @@ const TeacherTakeAttendance = () => {
           </div>
           <div className="mt-2">
             <button
-              className="bg-blue-500 px-8 py-2 rounded-md font-bold text-xl  text-white hover:bg-blue-400 m-4"
+              className="bg-blue-500 px-8 py-2 rounded-md font-bold text-xl text-white hover:bg-blue-400 m-4"
               onClick={sendDataToAttendanceApi}
             >
               Save Changes

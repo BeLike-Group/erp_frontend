@@ -44,7 +44,11 @@ const services = [
     title: "International Consultant",
     link: "/Consultant-portal-home",
   },
-  { img: ecomimg, title: "Ecommerce", link: "/Ecommerce-portal-home" },
+  {
+    img: ecomimg,
+    title: "Ecommerce",
+    link: "https://gregarious-fairy-be2043.netlify.app/",
+  },
   { img: jobimg, title: "Jobs", link: "/Job-portal-home" },
   {
     img: marketimg,

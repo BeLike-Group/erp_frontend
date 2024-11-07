@@ -157,6 +157,7 @@ function App() {
   const [studentLoading, setStudentLoading] = useState(true);
   const [adminLoading, setAdminLoading] = useState(true);
   const [teacherLoading, setTeacherLoading] = useState(true);
+
   axios.defaults.withCredentials = true;
   // axios.defaults.baseURL = "https://belikeerp-3.onrender.com"
   // axios.defaults.baseURL = "http://localhost:8000";
@@ -295,6 +296,7 @@ function App() {
             <Route path="/university-" element={<Department />} />
             <Route path="/Influencer-portal-home" element={<Influencer />} />
             <Route path="/Ecommerce-portal-home" element={<Ecommerce />} />
+            <Route path="/belike-partner-stores" element={<Ecommerce />} />
             <Route path="/Job-portal-home" element={<Job />} />
             <Route path="/food-portal-home" element={<Food />} />
             <Route path="/legal-home-portal" element={<Legal />} />
@@ -418,7 +420,7 @@ function App() {
             <Route
               path="/teacher-take-attendance"
               element={
-                isAdminAuthenticated || isTeacherAuthenticated ? (
+                isTeacherAuthenticated || isAdminAuthenticated ? (
                   <TeacherTakeAttendance />
                 ) : (
                   <TeacherLogin />
