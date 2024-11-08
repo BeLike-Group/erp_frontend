@@ -13,6 +13,8 @@ const TeacherTakeAttendance = () => {
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [grades, setGrades] = useState([]);
   const [gradeId, setGradeId] = useState(null);
+  const [emails, setEmails] = useState([]);
+  const [remData, setRemData] = useState([]);
   const navigate = useNavigate();
 
   // Load all grades and students on component mount
@@ -56,6 +58,7 @@ const TeacherTakeAttendance = () => {
     );
 
     setFilteredStudents(studentsInGrade);
+
     setAttendance(
       studentsInGrade.map((student) => ({
         studentId: student._id,
@@ -65,8 +68,14 @@ const TeacherTakeAttendance = () => {
 
     console.log("Selected Grade Category:", selectedGradeCategory);
     console.log("Filtered Students:", studentsInGrade); // Log filtered students
+    const allStudentEmails = studentsInGrade.map(
+      (student) => student.studentEmail
+    );
+    setEmails(allStudentEmails);
+    console.log("Filtered Students Emails:", allStudentEmails);
+    // console.log(`dekhty hain bhai to kia krta ha ${emails}`);
   };
-
+  console.log(`dekhty hain bhai to kia krta ha ${emails}`);
   const sendDataToAttendanceApi = async () => {
     if (attendance.length && gradeId) {
       const data = { attendanceStudents: attendance };
@@ -75,6 +84,9 @@ const TeacherTakeAttendance = () => {
           `/api/v1/teacher/take-attendance/${gradeId}`,
           data
         );
+
+        setRemData(data);
+        console.log("This is the data sent on attendance:", remData);
         handleShowSuccessToast(response.data.message);
         // navigate(`/teacher/view-grade-attendance`);
       } catch (error) {
@@ -93,6 +105,37 @@ const TeacherTakeAttendance = () => {
           : student
       )
     );
+  };
+  const sendReminder = async () => {
+    console.log("Attempting to send reminder to emails:", emails); // Debugging line to confirm emails list
+
+    if (emails.length === 0) {
+      handleShowFailureToast("No students found to send reminders.");
+      return;
+    }
+
+    try {
+      const std = {
+        stdData: remData,
+        Date: new Date().toLocaleString(),
+      };
+      const message1 = `Today Attendance: ${std.Date}/n ${JSON.stringify(
+        std.stdData
+      )}
+    `;
+
+      const response = await axios.post("/api/v1/reminder/send-reminder", {
+        recipientType: "Email",
+        recipients: emails,
+        message: message1,
+      });
+
+      handleShowSuccessToast("Reminder sent successfully.");
+      console.log("Response from send-reminder:", response.data); // Log response for debugging
+    } catch (error) {
+      console.error("Error sending reminder:", error);
+      handleShowSuccessToast("Reminder sent successfully.");
+    }
   };
 
   return (
@@ -134,6 +177,9 @@ const TeacherTakeAttendance = () => {
                         <th scope="col" className="px-6 py-4">
                           Today's Attendance
                         </th>
+                        <th scope="col" className="px-6 py-4">
+                          Email
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -165,6 +211,9 @@ const TeacherTakeAttendance = () => {
                               }
                             />
                           </td>
+                          <td className="whitespace-nowrap px-6 py-4">
+                            {student.studentEmail || "N/A"}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -180,6 +229,24 @@ const TeacherTakeAttendance = () => {
             >
               Save Changes
             </button>
+            <button
+              onClick={() => {
+                console.log("reminder send...");
+                sendReminder();
+              }}
+              className="bg-blue-500 px-8 py-2 rounded-md font-bold text-xl text-white hover:bg-blue-400 m-4"
+            >
+              Send Reminder
+            </button>
+            {/* <button
+              onClick={() => {
+                console.log("reminder send...");
+                // sendReminder(fee);
+              }}
+              className="bg-blue-500 text-white text-xs px-1 my-[0.30rem] py-1 rounded"
+            >
+              Send Reminder
+            </button> */}
           </div>
         </div>
       </div>
