@@ -47,7 +47,7 @@ const services = [
   {
     img: ecomimg,
     title: "Ecommerce",
-    link: "https://monumental-pasca-c60596.netlify.app/",
+    link: "https://belike-ecommerce.netlify.app/",
   },
   { img: jobimg, title: "Jobs", link: "/Job-portal-home" },
   {
