@@ -1,3 +1,4 @@
+import "react-toastify/dist/ReactToastify.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -5,8 +6,6 @@ import {
   handleShowSuccessToast,
 } from "../../ToastMessages/ToastMessage";
 import { Toaster } from "react-hot-toast";
-import { FaEyeSlash, FaEye } from "react-icons/fa";
-import ThreeDotLoader from "../../Loaders/ThreeDotLoader";
 import Modal from "react-modal";
 
 Modal.setAppElement("#root");
@@ -22,9 +21,8 @@ export const AdminAddStudent = () => {
     studentIdCardCopy: null,
     studentFee: "",
     amountPaid: "",
-    submissionDate: "", // Include submission date here
+    submissionDate: "",
   });
-
   const [courses, setCourses] = useState([]);
   const [grades, setGrades] = useState([]);
   const [selectedGrades, setSelectedGrades] = useState([]);
@@ -33,27 +31,39 @@ export const AdminAddStudent = () => {
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
-  const [show, setShow] = useState(true);
-
-  const handleShow = () => setShow(!show);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllGrades = async () => {
       try {
-        const gradesRes = await axios.get("/api/v1/admin/load-all-grades");
-        setGrades(gradesRes.data.grades);
-
-        const coursesRes = await axios.get("/api/v1/admin/load-all-courses");
-        setCourses(coursesRes.data.courses);
-
-        const studentsRes = await axios.get("/api/v1/admin/load-all-students");
-        setStudents(studentsRes.data.students);
+        const response = await axios.get("/api/v1/admin/load-all-grades");
+        setGrades(response.data.grades);
       } catch (error) {
-        handleShowFailureToast(error.response?.data?.message || error.message);
+        console.log(error.response?.data?.message || error.message);
       }
     };
-    fetchData();
-  }, []);
+    fetchAllGrades();
+
+    const fetchAllCourses = async () => {
+      try {
+        const response = await axios.get("/api/v1/admin/load-all-courses");
+        setCourses(response.data.courses);
+      } catch (error) {
+        console.log(error.response?.data?.message || error.message);
+      }
+    };
+    fetchAllCourses();
+
+    const fetchAllStudents = async () => {
+      try {
+        const response = await axios.get("/api/v1/admin/load-all-students");
+        setStudents(response.data.students);
+      } catch (error) {
+        console.log(error.response?.data?.message || error.message);
+      }
+    };
+    fetchAllStudents();
+  }, []); // Empty dependency array ensures this runs once on mount
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -65,33 +75,41 @@ export const AdminAddStudent = () => {
     setFormData((prev) => ({ ...prev, [name]: files[0] }));
   };
 
+  // const handleSelectChange = (e) => {
+  //   const { value, name } = e.target;
+  //   const selectedOption = JSON.parse(value);
+
+  //   if (name === "grades") {
+  //     setSelectedGrades((prev) =>
+  //       !prev.includes(selectedOption.gradeId)
+  //         ? [...prev, selectedOption.gradeId]
+  //         : prev
+  //     );
+  //   } else if (name === "courses") {
+  //     setSelectedCourses((prev) =>
+  //       !prev.includes(selectedOption.courseId)
+  //         ? [...prev, selectedOption.courseId]
+  //         : prev
+  //     );
+  //   }
+  // };
   const handleSelectChange = (e) => {
     const { value, name } = e.target;
     const selectedOption = JSON.parse(value);
 
     if (name === "grades") {
-      setSelectedGrades((prev) => {
-        const newGrades = [...prev];
-        if (!newGrades.includes(selectedOption.gradeId)) {
-          newGrades.push(selectedOption.gradeId);
-        }
-        return newGrades;
-      });
+      setSelectedGrades((prev) => [
+        ...new Set([...prev, selectedOption.gradeId]),
+      ]);
     } else if (name === "courses") {
-      setSelectedCourses((prev) => {
-        const newCourses = [...prev];
-        if (!newCourses.includes(selectedOption.courseId)) {
-          newCourses.push(selectedOption.courseId);
-        }
-        return newCourses;
-      });
+      setSelectedCourses((prev) => [
+        ...new Set([...prev, selectedOption.courseId]),
+      ]);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Check if any form field is empty or if grades/courses are not selected
     if (
       Object.values(formData).some((val) => !val) ||
       selectedGrades.length === 0 ||
@@ -104,10 +122,9 @@ export const AdminAddStudent = () => {
     }
 
     const formDataObj = new FormData();
-    Object.keys(formData).forEach((key) => {
-      formDataObj.append(key, formData[key]);
-    });
-
+    Object.keys(formData).forEach((key) =>
+      formDataObj.append(key, formData[key])
+    );
     selectedGrades.forEach((grade) =>
       formDataObj.append("studentGrades[]", grade)
     );
@@ -125,9 +142,12 @@ export const AdminAddStudent = () => {
       const response = await axios[method](url, formDataObj, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       handleShowSuccessToast(response.data.message);
-      setIsModalOpen(false); // Close modal after submission
+      setIsModalOpen(false);
+      // Refresh students list after adding/updating
+      const studentsRes = await axios.get("/api/v1/admin/load-all-students");
+      setStudents(studentsRes.data.students);
+      setEditingStudent(null); // Reset editing state
     } catch (error) {
       handleShowFailureToast(error.response?.data?.message || error.message);
     } finally {
@@ -155,7 +175,7 @@ export const AdminAddStudent = () => {
       studentIdCardCopy: null,
       studentFee: "",
       amountPaid: "",
-      submissionDate: student?.submissionDate || "", // Set date if editing
+      submissionDate: student?.submissionDate || "",
     });
     setSelectedGrades(student?.studentGrades?.map((g) => g.gradeId) || []);
     setSelectedCourses(student?.studentCourses?.map((c) => c.courseId) || []);
@@ -175,15 +195,20 @@ export const AdminAddStudent = () => {
     }
   };
 
+  // Custom modal styles
   const customStyles = {
     content: {
       top: "50%",
       left: "50%",
+      right: "auto",
+      bottom: "auto",
       transform: "translate(-50%, -50%)",
       padding: "2rem",
       borderRadius: "0.5rem",
       width: "90%",
       maxWidth: "800px",
+      maxHeight: "90vh",
+      overflowY: "auto",
       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     },
     overlay: {
@@ -250,146 +275,298 @@ export const AdminAddStudent = () => {
         <h2 className="text-xl font-semibold">
           {editingStudent ? "Edit Student" : "Add New Student"}
         </h2>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 mt-4 text-black h-full"
-          encType="multipart/form-data"
-        >
-          <div className="space-y-4">
-            {/* Form Fields */}
-            <label className="text-lg">Name</label>
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          <div className="flex flex-col">
+            <label
+              htmlFor="studentName"
+              className="text-sm font-medium text-gray-700"
+            >
+              Name
+            </label>
             <input
               type="text"
+              id="studentName"
               name="studentName"
               value={formData.studentName}
               onChange={handleInputChange}
-              required
-              className="w-full p-3 border rounded-lg"
+              className="mt-1 p-2 border border-gray-300 rounded"
             />
+          </div>
 
-            <label className="text-lg">Email</label>
+          <div className="flex flex-col">
+            <label
+              htmlFor="studentEmail"
+              className="text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
             <input
               type="email"
+              id="studentEmail"
               name="studentEmail"
               value={formData.studentEmail}
               onChange={handleInputChange}
-              required
-              className="w-full p-3 border rounded-lg"
+              className="mt-1 p-2 border border-gray-300 rounded"
             />
+          </div>
 
-            <label className="text-lg">Password</label>
-            <div className="relative">
-              <input
-                type={show ? "password" : "text"}
-                name="studentPassword"
-                value={formData.studentPassword}
-                onChange={handleInputChange}
-                required
-                className="w-full p-3 border rounded-lg"
-              />
-              <span
-                className="absolute right-3 top-3 cursor-pointer"
-                onClick={handleShow}
-              >
-                {show ? <FaEyeSlash /> : <FaEye />}
-              </span>
-            </div>
-
-            {/* New Date Field */}
-            <label className="text-lg">Submission Date</label>
+          <div className="flex flex-col">
+            <label
+              htmlFor="studentPassword"
+              className="text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
             <input
-              type="date"
-              name="submissionDate"
-              value={formData.submissionDate}
+              type={showPassword ? "text" : "password"}
+              id="studentPassword"
+              name="studentPassword"
+              value={formData.studentPassword}
               onChange={handleInputChange}
-              required
-              className="w-full p-3 border rounded-lg"
+              className="mt-1 p-2 border border-gray-300 rounded"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="mt-1 text-sm text-blue-600"
+            >
+              {showPassword ? "Hide" : "Show"} Password
+            </button>
+          </div>
 
-            {/* Remaining Fields */}
-            <label className="text-lg">Student ID</label>
+          <div className="flex flex-col">
+            <label
+              htmlFor="studentId"
+              className="text-sm font-medium text-gray-700"
+            >
+              Student ID
+            </label>
             <input
               type="text"
+              id="studentId"
               name="studentId"
               value={formData.studentId}
               onChange={handleInputChange}
-              required
-              className="w-full p-3 border rounded-lg"
+              className="mt-1 p-2 border border-gray-300 rounded"
             />
+          </div>
 
-            <label className="text-lg">ID Card Number</label>
+          <div className="flex flex-col">
+            <label
+              htmlFor="studentIdCardNumber"
+              className="text-sm font-medium text-gray-700"
+            >
+              Student ID Card Number
+            </label>
             <input
               type="text"
+              id="studentIdCardNumber"
               name="studentIdCardNumber"
               value={formData.studentIdCardNumber}
               onChange={handleInputChange}
-              required
-              className="w-full p-3 border rounded-lg"
+              className="mt-1 p-2 border border-gray-300 rounded"
             />
+          </div>
 
-            <label className="text-lg">Avatar</label>
+          <div className="flex flex-col">
+            <label
+              htmlFor="studentAvatar"
+              className="text-sm font-medium text-gray-700"
+            >
+              Avatar (optional)
+            </label>
             <input
               type="file"
+              id="studentAvatar"
               name="studentAvatar"
               onChange={handleFileChange}
-              accept="image/*"
-              className="w-full p-3 border rounded-lg"
+              className="mt-1 p-2 border border-gray-300 rounded"
             />
+          </div>
 
-            <label className="text-lg">ID Card Copy</label>
+          <div className="flex flex-col">
+            <label
+              htmlFor="studentIdCardCopy"
+              className="text-sm font-medium text-gray-700"
+            >
+              ID Card Copy (optional)
+            </label>
             <input
               type="file"
+              id="studentIdCardCopy"
               name="studentIdCardCopy"
               onChange={handleFileChange}
-              className="w-full p-3 border rounded-lg"
+              className="mt-1 p-2 border border-gray-300 rounded"
             />
+          </div>
 
-            {/* Select Grades and Courses */}
-            <div className="space-y-4">
-              <label className="text-lg">Select Grades</label>
-              <select
-                name="grades"
-                className="w-full p-3 border rounded-lg"
-                onChange={handleSelectChange}
-              >
-                <option value="">Select Grade</option>
-                {grades.map((grade) => (
-                  <option
-                    key={grade.gradeId}
-                    value={JSON.stringify({ gradeId: grade.gradeId })}
+          <div className="flex flex-col">
+            <label
+              htmlFor="studentFee"
+              className="text-sm font-medium text-gray-700"
+            >
+              Fee Amount
+            </label>
+            <input
+              type="number"
+              id="studentFee"
+              name="studentFee"
+              value={formData.studentFee}
+              onChange={handleInputChange}
+              className="mt-1 p-2 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label
+              htmlFor="amountPaid"
+              className="text-sm font-medium text-gray-700"
+            >
+              Amount Paid
+            </label>
+            <input
+              type="number"
+              id="amountPaid"
+              name="amountPaid"
+              value={formData.amountPaid}
+              onChange={handleInputChange}
+              className="mt-1 p-2 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label
+              htmlFor="submissionDate"
+              className="text-sm font-medium text-gray-700"
+            >
+              Submission Date
+            </label>
+            <input
+              type="date"
+              id="submissionDate"
+              name="submissionDate"
+              value={formData.submissionDate}
+              onChange={handleInputChange}
+              className="mt-1 p-2 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label
+              htmlFor="grades"
+              className="text-sm font-medium text-gray-700"
+            >
+              Select Grades
+            </label>
+            <select
+              id="grades"
+              name="grades"
+              onChange={handleSelectChange}
+              className="mt-1 p-2 border border-gray-300 rounded"
+              multiple
+            >
+              {grades.map((grade) => (
+                <option key={grade.gradeId} value={JSON.stringify(grade)}>
+                  {grade.gradeCategory}
+                </option>
+              ))}
+            </select>
+            <div className="mt-2 flex flex-wrap">
+              {selectedGrades.map((gradeId) => {
+                const grade = grades.find((g) => g.gradeId === gradeId);
+                return (
+                  <span
+                    key={gradeId}
+                    className="inline-block bg-white text-black rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2"
                   >
                     {grade.gradeCategory}
-                  </option>
-                ))}
-              </select>
-
-              <label className="text-lg">Select Courses</label>
-              <select
-                name="courses"
-                className="w-full p-3 border rounded-lg"
-                onChange={handleSelectChange}
-              >
-                <option value="">Select Course</option>
-                {courses.map((course) => (
-                  <option
-                    key={course.courseId}
-                    value={JSON.stringify({ courseId: course.courseId })}
-                  >
-                    {course.courseTitle}
-                  </option>
-                ))}
-              </select>
+                    <button
+                      type="button"
+                      onClick={() => removeSelection(gradeId, "grades")}
+                      className="ml-2 text-red-500"
+                    >
+                      Remove
+                    </button>
+                  </span>
+                );
+              })}
             </div>
+          </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Courses
+            </label>
+            <select
+              name="courses"
+              onChange={handleSelectChange}
+              className="text-black p-2 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="" disabled selected>
+                Select courses
+              </option>
+              {courses.map((course) => (
+                <option
+                  key={course._id}
+                  value={JSON.stringify({
+                    courseId: course._id,
+                    courseTitle: course.courseTitle,
+                  })}
+                >
+                  {course.courseTitle}
+                </option>
+              ))}
+            </select>
+            <div className="mt-2 flex flex-wrap">
+              {selectedCourses.map((courseId) => {
+                // Find the selected course
+                const course = courses.find((c) => c._id === courseId);
+
+                // If the course is not found, return a fallback message
+                if (!course) {
+                  return (
+                    <span
+                      key={courseId}
+                      className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                    >
+                      Course not found{" "}
+                      <button
+                        type="button"
+                        onClick={() => removeSelection(courseId, "courses")}
+                        className="text-red-500 ml-2"
+                      >
+                        x
+                      </button>
+                    </span>
+                  );
+                }
+
+                return (
+                  <span
+                    key={courseId}
+                    className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  >
+                    {course.courseTitle}{" "}
+                    <button
+                      type="button"
+                      onClick={() => removeSelection(courseId, "courses")}
+                      className="text-red-500 ml-2"
+                    >
+                      x
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex justify-end">
             <button
               type="submit"
-              className="w-full mt-4 py-3 bg-green-600 text-white rounded-lg"
+              className="text-white bg-blue-600 px-4 py-2 rounded"
+              disabled={loading}
             >
-              {loading ? (
-                <ThreeDotLoader />
-              ) : (
-                `${editingStudent ? "Update" : "Add"} Student`
-              )}
+              {loading ? "Saving..." : "Save Student"}
             </button>
           </div>
         </form>
