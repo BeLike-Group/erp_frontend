@@ -6,9 +6,12 @@ import {
   handleShowSuccessToast,
 } from "../../ToastMessages/ToastMessage";
 import { Toaster } from "react-hot-toast";
+import { FaEyeSlash, FaEye } from "react-icons/fa";
+
+import ThreeDotLoader from "../../Loaders/ThreeDotLoader";
 import Modal from "react-modal";
 
-Modal.setAppElement("#root");
+Modal.setAppElement("#root"); // Ensure accessibility
 
 export const AdminAddStudent = () => {
   const [formData, setFormData] = useState({
@@ -20,9 +23,10 @@ export const AdminAddStudent = () => {
     studentAvatar: null,
     studentIdCardCopy: null,
     studentFee: "",
-    amountPaid: "",
-    submissionDate: "",
+    amountPaid: "", // New field
+    submissionDate: "", // New field
   });
+
   const [courses, setCourses] = useState([]);
   const [grades, setGrades] = useState([]);
   const [selectedGrades, setSelectedGrades] = useState([]);
@@ -31,7 +35,11 @@ export const AdminAddStudent = () => {
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
+  const [show, setShow] = useState(true);
+
+  const handleShow = () => {
+    setShow(!show);
+  };
 
   useEffect(() => {
     const fetchAllGrades = async () => {
@@ -39,7 +47,7 @@ export const AdminAddStudent = () => {
         const response = await axios.get("/api/v1/admin/load-all-grades");
         setGrades(response.data.grades);
       } catch (error) {
-        console.log(error.response?.data?.message || error.message);
+        console.log(error.response.data.message);
       }
     };
     fetchAllGrades();
@@ -49,7 +57,7 @@ export const AdminAddStudent = () => {
         const response = await axios.get("/api/v1/admin/load-all-courses");
         setCourses(response.data.courses);
       } catch (error) {
-        console.log(error.response?.data?.message || error.message);
+        console.log(error.response.data.message);
       }
     };
     fetchAllCourses();
@@ -59,11 +67,11 @@ export const AdminAddStudent = () => {
         const response = await axios.get("/api/v1/admin/load-all-students");
         setStudents(response.data.students);
       } catch (error) {
-        console.log(error.response?.data?.message || error.message);
+        console.log(error.response.data.message);
       }
     };
     fetchAllStudents();
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -75,24 +83,6 @@ export const AdminAddStudent = () => {
     setFormData((prev) => ({ ...prev, [name]: files[0] }));
   };
 
-  // const handleSelectChange = (e) => {
-  //   const { value, name } = e.target;
-  //   const selectedOption = JSON.parse(value);
-
-  //   if (name === "grades") {
-  //     setSelectedGrades((prev) =>
-  //       !prev.includes(selectedOption.gradeId)
-  //         ? [...prev, selectedOption.gradeId]
-  //         : prev
-  //     );
-  //   } else if (name === "courses") {
-  //     setSelectedCourses((prev) =>
-  //       !prev.includes(selectedOption.courseId)
-  //         ? [...prev, selectedOption.courseId]
-  //         : prev
-  //     );
-  //   }
-  // };
   const handleSelectChange = (e) => {
     const { value, name } = e.target;
     const selectedOption = JSON.parse(value);
@@ -110,6 +100,7 @@ export const AdminAddStudent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (
       Object.values(formData).some((val) => !val) ||
       selectedGrades.length === 0 ||
@@ -121,33 +112,65 @@ export const AdminAddStudent = () => {
       return;
     }
 
-    const formDataObj = new FormData();
-    Object.keys(formData).forEach((key) =>
-      formDataObj.append(key, formData[key])
-    );
-    selectedGrades.forEach((grade) =>
-      formDataObj.append("studentGrades[]", grade)
-    );
-    selectedCourses.forEach((course) =>
-      formDataObj.append("studentCourses[]", course)
-    );
+    const {
+      studentAvatar,
+      studentIdCardCopy,
+      studentName,
+      studentEmail,
+      studentPassword,
+      studentId,
+      studentIdCardNumber,
+      studentFee,
+      amountPaid, // Include amountPaid
+      submissionDate, // Include submissionDate
+    } = formData;
+
+    const data = {
+      studentName,
+      studentEmail,
+      studentPassword,
+      studentId,
+      studentIdCardNumber,
+      studentAvatar,
+      studentIdCardCopy,
+      studentGrades: selectedGrades.map((grade) => ({ gradeId: grade })),
+      studentCourses: selectedCourses.map((course) => ({ courseId: course })),
+      studentFee,
+      amountPaid, // Include amountPaid
+      submissionDate, // Include submissionDate
+    };
 
     try {
       setLoading(true);
       const url = editingStudent
         ? `/api/v1/admin/update-student/${editingStudent._id}`
-        : `/api/v1/admin/add-student`;
-      const method = editingStudent ? "patch" : "post";
-
-      const response = await axios[method](url, formDataObj, {
+        : `/api/v1/admin/add-student/${selectedGrades}`;
+      const response = await axios.post(url, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       handleShowSuccessToast(response.data.message);
+      setFormData({
+        studentName: "",
+        studentEmail: "",
+        studentPassword: "",
+        studentId: "",
+        studentIdCardNumber: "",
+        studentAvatar: null,
+        studentIdCardCopy: null,
+        studentFee: "",
+        amountPaid: "", // Reset field
+        submissionDate: "", // Reset field
+      });
+      setSelectedGrades([]);
+      setSelectedCourses([]);
       setIsModalOpen(false);
-      // Refresh students list after adding/updating
-      const studentsRes = await axios.get("/api/v1/admin/load-all-students");
-      setStudents(studentsRes.data.students);
-      setEditingStudent(null); // Reset editing state
+      setEditingStudent(null);
+
+      // Fetch updated students
+      const studentsResponse = await axios.get(
+        "/api/v1/admin/load-all-students"
+      );
+      setStudents(studentsResponse.data.students);
     } catch (error) {
       handleShowFailureToast(error.response?.data?.message || error.message);
     } finally {
@@ -174,24 +197,25 @@ export const AdminAddStudent = () => {
       studentAvatar: null,
       studentIdCardCopy: null,
       studentFee: "",
-      amountPaid: "",
-      submissionDate: student?.submissionDate || "",
+      amountPaid: "", // Reset field for editing
+      submissionDate: "", // Reset field for editing
     });
-    setSelectedGrades(student?.studentGrades?.map((g) => g.gradeId) || []);
-    setSelectedCourses(student?.studentCourses?.map((c) => c.courseId) || []);
+    setSelectedGrades(student?.studentGrades.map((g) => g.gradeId) || []);
+    setSelectedCourses(student?.studentCourses.map((c) => c.courseId) || []);
     setIsModalOpen(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this student?")) {
-      try {
-        await axios.delete(`/api/v1/admin/delete-student/${id}`);
-        handleShowSuccessToast("Student deleted successfully!");
-        const studentsRes = await axios.get("/api/v1/admin/load-all-students");
-        setStudents(studentsRes.data.students);
-      } catch (error) {
-        handleShowFailureToast(error.response?.data?.message || error.message);
-      }
+    try {
+      await axios.delete(`/api/v1/admin/delete-student/${id}`);
+      handleShowSuccessToast("Student deleted successfully!");
+      // Fetch updated students
+      const studentsResponse = await axios.get(
+        "/api/v1/admin/load-all-students"
+      );
+      setStudents(studentsResponse.data.students);
+    } catch (error) {
+      handleShowFailureToast(error.response?.data?.message || error.message);
     }
   };
 
@@ -221,7 +245,7 @@ export const AdminAddStudent = () => {
       <Toaster />
       <button
         onClick={() => openModal()}
-        className="flex mx-auto justify-center items-center text-white bg-[#40b08c] border-0 py-2 px-6 focus:outline-none hover:bg-[#75dbbb] rounded text-lg"
+        className="flex mx-auto justify-center items-center text-white bg-[#40b08c] border-0 py-1 px-4 focus:outline-none hover:bg-[#75dbbb] rounded text-lg"
       >
         Add New Student
       </button>
@@ -270,229 +294,226 @@ export const AdminAddStudent = () => {
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
         style={customStyles}
-        contentLabel="Add/Update Student"
       >
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-2xl font-semibold mb-4">
           {editingStudent ? "Edit Student" : "Add New Student"}
         </h2>
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-          <div className="flex flex-col">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
             <label
               htmlFor="studentName"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
-              Name
+              Student Name
             </label>
             <input
               type="text"
-              id="studentName"
               name="studentName"
+              id="studentName"
               value={formData.studentName}
               onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="mb-4">
             <label
               htmlFor="studentEmail"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
-              Email
+              Student Email
             </label>
             <input
               type="email"
-              id="studentEmail"
               name="studentEmail"
+              id="studentEmail"
               value={formData.studentEmail}
               onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="mb-4">
             <label
               htmlFor="studentPassword"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
               Password
             </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="studentPassword"
-              name="studentPassword"
-              value={formData.studentPassword}
-              onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="mt-1 text-sm text-blue-600"
-            >
-              {showPassword ? "Hide" : "Show"} Password
-            </button>
+            <div className="relative">
+              <input
+                type={show ? "password" : "text"}
+                name="studentPassword"
+                id="studentPassword"
+                value={formData.studentPassword}
+                onChange={handleInputChange}
+                className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              />
+              <button
+                type="button"
+                onClick={handleShow}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2"
+              >
+                {show ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
-
-          <div className="flex flex-col">
+          <div className="mb-4">
             <label
               htmlFor="studentId"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
               Student ID
             </label>
             <input
               type="text"
-              id="studentId"
               name="studentId"
+              id="studentId"
               value={formData.studentId}
               onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="mb-4">
             <label
               htmlFor="studentIdCardNumber"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
-              Student ID Card Number
+              ID Card Number
             </label>
             <input
               type="text"
-              id="studentIdCardNumber"
               name="studentIdCardNumber"
+              id="studentIdCardNumber"
               value={formData.studentIdCardNumber}
               onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="mb-4">
             <label
               htmlFor="studentAvatar"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
-              Avatar (optional)
+              Avatar
             </label>
             <input
               type="file"
-              id="studentAvatar"
               name="studentAvatar"
+              id="studentAvatar"
               onChange={handleFileChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="mb-4">
             <label
               htmlFor="studentIdCardCopy"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
-              ID Card Copy (optional)
+              ID Card Copy
             </label>
             <input
               type="file"
-              id="studentIdCardCopy"
               name="studentIdCardCopy"
+              id="studentIdCardCopy"
               onChange={handleFileChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="mb-4">
             <label
               htmlFor="studentFee"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
-              Fee Amount
+              Fee
             </label>
             <input
-              type="number"
-              id="studentFee"
+              type="text"
               name="studentFee"
+              id="studentFee"
               value={formData.studentFee}
               onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="mb-4">
             <label
               htmlFor="amountPaid"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
               Amount Paid
             </label>
             <input
               type="number"
-              id="amountPaid"
               name="amountPaid"
+              id="amountPaid"
               value={formData.amountPaid}
               onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
-          <div className="flex flex-col">
+          <div className="mb-4">
             <label
               htmlFor="submissionDate"
-              className="text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
               Submission Date
             </label>
             <input
               type="date"
-              id="submissionDate"
               name="submissionDate"
+              id="submissionDate"
               value={formData.submissionDate}
               onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
+              className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
-          <div className="flex flex-col">
-            <label
-              htmlFor="grades"
-              className="text-sm font-medium text-gray-700"
-            >
-              Select Grades
+          {/* grade */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Grades
             </label>
             <select
-              id="grades"
               name="grades"
               onChange={handleSelectChange}
-              className="mt-1 p-2 border border-gray-300 rounded"
-              multiple
+              className="text-black p-2 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
+              <option value="" disabled selected>
+                Select grades
+              </option>
               {grades.map((grade) => (
-                <option key={grade.gradeId} value={JSON.stringify(grade)}>
+                <option
+                  key={grade._id}
+                  className=""
+                  value={JSON.stringify({
+                    gradeId: grade._id,
+                    gradeCategory: grade.gradeCategory,
+                  })}
+                >
                   {grade.gradeCategory}
                 </option>
               ))}
             </select>
             <div className="mt-2 flex flex-wrap">
               {selectedGrades.map((gradeId) => {
-                const grade = grades.find((g) => g.gradeId === gradeId);
+                const grade = grades.find((g) => g._id === gradeId);
                 return (
                   <span
                     key={gradeId}
-                    className="inline-block bg-white text-black rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2"
+                    className="inline-block bg-white text-black rounded-full px-3 py-1 text-sm font-semibold  mr-2 mb-2"
                   >
-                    {grade.gradeCategory}
+                    {grade.gradeCategory}{" "}
                     <button
                       type="button"
                       onClick={() => removeSelection(gradeId, "grades")}
-                      className="ml-2 text-red-500"
+                      className="text-red-500 ml-2"
                     >
-                      Remove
+                      x
                     </button>
                   </span>
                 );
               })}
             </div>
           </div>
-
+          {/* course */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Courses
@@ -519,28 +540,7 @@ export const AdminAddStudent = () => {
             </select>
             <div className="mt-2 flex flex-wrap">
               {selectedCourses.map((courseId) => {
-                // Find the selected course
                 const course = courses.find((c) => c._id === courseId);
-
-                // If the course is not found, return a fallback message
-                if (!course) {
-                  return (
-                    <span
-                      key={courseId}
-                      className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-                    >
-                      Course not found{" "}
-                      <button
-                        type="button"
-                        onClick={() => removeSelection(courseId, "courses")}
-                        className="text-red-500 ml-2"
-                      >
-                        x
-                      </button>
-                    </span>
-                  );
-                }
-
                 return (
                   <span
                     key={courseId}
@@ -559,14 +559,19 @@ export const AdminAddStudent = () => {
               })}
             </div>
           </div>
-
-          <div className="flex justify-end">
+          <div className="flex justify-between">
             <button
               type="submit"
-              className="text-white bg-blue-600 px-4 py-2 rounded"
-              disabled={loading}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
             >
-              {loading ? "Saving..." : "Save Student"}
+              {editingStudent ? "Update Student" : "Add Student"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              className="bg-gray-300 text-black px-4 py-2 rounded"
+            >
+              Cancel
             </button>
           </div>
         </form>
