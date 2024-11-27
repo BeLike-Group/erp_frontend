@@ -38,7 +38,11 @@ const services = [
     title: "Welfare Activities",
     link: "/donation-portal-home",
   },
-  { img: travelimg, title: "Travel", link: "/tra-portal-home" },
+  {
+    img: travelimg,
+    title: "Travel",
+    link: "https://belike-travel-tour.netlify.app/",
+  },
   {
     img: internationalimg,
     title: "International Consultant",
