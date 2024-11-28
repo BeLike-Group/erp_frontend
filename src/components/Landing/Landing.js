@@ -41,7 +41,7 @@ const services = [
   {
     img: travelimg,
     title: "Travel",
-    link: "https://belike-travel-tour.netlify.app/",
+    link: "https://wander-aura-oq00lnvym-gm-sanis-projects.vercel.app/",
   },
   {
     img: internationalimg,
