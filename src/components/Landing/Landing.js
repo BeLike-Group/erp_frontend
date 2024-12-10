@@ -51,7 +51,7 @@ const services = [
   {
     img: ecomimg,
     title: "Ecommerce",
-    link: "https://belike-ecommerce.netlify.app/",
+    link: "https://belike-store.netlify.app/",
   },
   { img: jobimg, title: "Jobs", link: "/Job-portal-home" },
   {
