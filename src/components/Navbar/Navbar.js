@@ -34,14 +34,17 @@ export default function Navbar() {
               <li className="nav-item mt-1 md:mt-0">
                 <Link to="/" className="text-white">Home</Link>
               </li>
+              {/* <li className="nav-item mt-1 md:mt-0">
+              <Link to="#servicesSection" className="text-white">Services</Link>
+              </li> */}
               <li className="nav-item mt-1 md:mt-0">
-              <Link to="servicesSection" className="text-white">Services</Link>
+                <a href="#servicesSection" className="text-white">Services</a>
               </li>
               <li className="nav-item mt-1 md:mt-0">
-                <a href="https://example.com" className="text-white">About Us</a>
+                <a href="#aboutus" className="text-white">About Us</a>
               </li>
               <li className="nav-item mt-1 md:mt-0">
-                <a href="https://example.com" className="text-white">Contact Us</a>
+                <a href="#contactus" className="text-white">Contact Us</a>
               </li>
             </ul>
           </div>

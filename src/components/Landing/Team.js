@@ -55,7 +55,9 @@ const teamMembers = [
 const Team = () => {
   return (
     <div>
-      <section className="bg-gradient-to-r from-green-400 to-blue-500 text-black body-font p-4">
+      <section className="bg-gradient-to-r from-green-400 to-blue-500 text-black body-font p-4 "
+      
+      >
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
             <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-black hover:text-white">

@@ -41,7 +41,7 @@ const services = [
   {
     img: travelimg,
     title: "Travel",
-    link: "https://beliketraveltour.netlify.app/",
+    link: "https://travel-tour-front.vercel.app/",
   },
   {
     img: internationalimg,
@@ -114,7 +114,7 @@ const Landingpage = () => {
               Our IT Portal Services
               <p className="text-[1rem] pt-2">(Belike Software)</p>
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div id="servicesSection" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {services.map((service, index) => (
                 <motion.div
                   key={index}

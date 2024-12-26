@@ -4,7 +4,10 @@ import logo from "../../Assets/logo.png";
 
 const Info = () => {
   return (
-    <div className="bg-gradient-to-r from-white to-green-400 p-6 md:p-12 flex flex-col md:flex-row items-center">
+    <div className="bg-gradient-to-r from-white to-green-400 p-6 md:p-12 flex flex-col md:flex-row items-center"
+    id="aboutus"
+    
+    >
       <motion.div
         className="px-12 md:pl-32"
         initial={{ opacity: 0, x: -50 }}
