@@ -19,14 +19,14 @@ const teamMembers = [
     role: "MD",
     image: Nazia,
   },
-  {
-    name: "Dr. Mehek Fatima",
-    role: "COO",
-    image: Mehek,
-  },
+  // {
+  //   name: "",
+  //   role: "COO",
+  //   image: Mehek,
+  // },
   {
     name: "Minahil",
-    role: "Institute Director",
+    role: "Project Director",
     image: Minahil,
   },
   {
@@ -40,14 +40,19 @@ const teamMembers = [
     image: Faheem,
   },
   {
+    name: "Advocate Samiya Tahir",
+    role: "Legal Advisor",
+    image: Nazia,
+  },
+  {
     name: "Ahmad Usman",
     role: "County project director",
     image: Ahmad,
   },
   {
-    name: "Ghulam Murtaza Sani",
+    name: "Sheikh Abubakar Kareem",
     role: "Software Engineer",
-    image: Gms,
+    image: Nazia,
   },
 ];
 
