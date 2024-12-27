@@ -51,7 +51,7 @@ const Footer = () => {
           <div className="flex items-center">
             <FaMapMarkerAlt className="text-red-500 mr-2" size={20} />
             <span className="text-[0.95rem]">
-            21 1c1 college road township near lajna chowk Dhaka bhaya baryani Lahore            </span>
+            21 1C1 College Road Township Near Lajna Chowk Dhaka Bhaya Baryani Lahore              </span>
           </div>
         </div>
 
