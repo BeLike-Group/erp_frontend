@@ -61,15 +61,17 @@ const Investor = () => {
 
   return (
     <div className="justify-center items-center bg-gradient-to-r from-blue-500 to-white">
-      <h1 className=" text-5xl text-black font-bold text-center py-10">
-        Investors
+      <h1 className="text-5xl text-black font-bold text-center py-10">
+        Our Valued Clients
       </h1>
       <p className="text-center text-black">
-        DK Group attracts investors seeking superior returns and ethical
-        investment <br />
-        opportunities supported by robust financial expertise
-        <br /> and a proven track record.
+        At Belike Group, we prioritize our clients by offering tailored solutions 
+        designed to meet their unique needs. <br />
+        Our commitment to excellence ensures personalized support, <br />
+        expert guidance, and a partnership built on trust and results.
       </p>
+
+
       <div className="container mx-auto px-4 md:px-24 m-16">
         <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {projects

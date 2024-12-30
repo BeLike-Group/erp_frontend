@@ -141,7 +141,6 @@ const Landingpage = () => {
             </div>
           </div>
         </div>
-
         {/* <Project /> */}
         <Info />
         <Team />
