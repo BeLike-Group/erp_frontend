@@ -30,6 +30,18 @@ const services = [
   { img: schoolimg, title: "Schools", link: "/school-portal-home" },
   { img: collegeimg, title: "Colleges", link: "/schoolblocks" },
   { img: universityimg, title: "Universities", link: "/uni-portal-home" },
+
+  {
+    img: travelimg,
+    title: "Travel",
+    link: "https://travel-tour-front.vercel.app/",
+  },
+  {
+    img: ecomimg,
+    title: "Ecommerce",
+    link: "https://belike-store.netlify.app/",
+  },
+  { img: jobimg, title: "Jobs", link: "https://job-frontend-belike.vercel.app/" },
   { img: healthimg, title: "Health", link: "/health-portal-home" },
   { img: belikeproperty, title: "Property Services", link: "/ser-portal-home" },
   { img: Itskillimg, title: "IT Skills", link: "/it-portal-home" },
@@ -39,26 +51,16 @@ const services = [
     link: "/donation-portal-home",
   },
   {
-    img: travelimg,
-    title: "Travel",
-    link: "https://travel-tour-front.vercel.app/",
+    img: marketimg,
+    title: "Influencer/Bloggers",
+    link: "/Influencer-portal-home",
   },
   {
     img: internationalimg,
     title: "International Consultant",
     link: "/Consultant-portal-home",
   },
-  {
-    img: ecomimg,
-    title: "Ecommerce",
-    link: "https://belike-store.netlify.app/",
-  },
-  { img: jobimg, title: "Jobs", link: "/Job-portal-home" },
-  {
-    img: marketimg,
-    title: "Influencer/Bloggers",
-    link: "/Influencer-portal-home",
-  },
+
   { img: foodimg, title: "Food", link: "/food-portal-home" },
   { img: belikecustomimg2, title: "Legal Service", link: "/legal-home-portal" },
 ];
