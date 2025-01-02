@@ -41,7 +41,7 @@ const services = [
     title: "Ecommerce",
     link: "https://belike-store.netlify.app/",
   },
-  { img: jobimg, title: "Jobs", link: "https://job-frontend-belike.vercel.app/" },
+  { img: jobimg, title: "Jobs", link: "https://job-frontend-tau.vercel.app/" },
   { img: healthimg, title: "Health", link: "/health-portal-home" },
   { img: belikeproperty, title: "Property Services", link: "/ser-portal-home" },
   { img: Itskillimg, title: "IT Skills", link: "/it-portal-home" },
