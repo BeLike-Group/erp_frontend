@@ -39,7 +39,7 @@ const services = [
   {
     img: ecomimg,
     title: "Ecommerce",
-    link: "https://belike-store.netlify.app/",
+    link: "https://store-liard-ten.vercel.app/",
   },
   { img: jobimg, title: "Jobs", link: "https://job-frontend-tau.vercel.app/" },
   { img: healthimg, title: "Health", link: "/health-portal-home" },
