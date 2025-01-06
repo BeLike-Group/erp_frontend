@@ -161,7 +161,7 @@ function App() {
   axios.defaults.withCredentials = true;
   // axios.defaults.baseURL = "https://belikeerp-3.onrender.com"
   // axios.defaults.baseURL = "http://localhost:8000";
-  axios.defaults.baseURL = "https://erp-backend-zmvp.onrender.com";
+  axios.defaults.baseURL = "https://erp-backend-cimv.onrender.com";
 
   useEffect(() => {
     dispatch(loadCurrentStudentAction())
