@@ -4,10 +4,7 @@ import logo from "../../Assets/logo.png";
 
 const Info = () => {
   return (
-    <div className="bg-gradient-to-r from-white to-green-400 p-6 md:p-12 flex flex-col md:flex-row items-center"
-    id="aboutus"
-    
-    >
+    <div className="bg-gradient-to-r from-white to-green-400 p-6 md:p-12 flex flex-col md:flex-row items-center" id="aboutus">
       <motion.div
         className="px-12 md:pl-32"
         initial={{ opacity: 0, x: -50 }}
@@ -48,14 +45,24 @@ const Info = () => {
           </motion.li>
         </motion.ul>
       </motion.div>
-      <motion.img
-        className="w-96 h-75 mx-auto rounded-xl"
-        src={logo}
-        alt="img"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, delay: 0.8 }}
-      />
+      <motion.div className="text-center">
+        <motion.img
+          className="w-96 h-75 mx-auto rounded-xl"
+          src={logo}
+          alt="img"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+        />
+        <motion.span
+          className="text-white font-bold text-xl mt-4 block"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1 }}
+        >
+          AI Portal
+        </motion.span>
+      </motion.div>
     </div>
   );
 };
