@@ -7,6 +7,7 @@ import Faheem from "./Pics/team/Faheem.jpg";
 import Gms from "./Pics/team/GMS.jpg";
 import Usman from "./Pics/team/Usman.jpg"; // Usman (Product Manager)
 import Ahmad from "./Pics/team/Ahmad.jpg";
+import sheikh from "./Pics/team/blankPic.jpg";
 // Array of team members
 const teamMembers = [
   {
@@ -19,7 +20,6 @@ const teamMembers = [
     role: "Managing Director",
     image: Nazia,
 
-    image: Nazia,
   },
   // {
   //   name: "",
@@ -44,7 +44,7 @@ const teamMembers = [
   {
     name: "Advocate Samiya Tahir",
     role: "Legal Advisor",
-    image: Nazia,
+    image: sheikh,
   },
   {
     name: "Ahmad Usman",
@@ -54,7 +54,8 @@ const teamMembers = [
   {
     name: "Sheikh Abubakar Kareem",
     role: "Software Engineer",
-    image: Nazia,
+    image: sheikh,
+    
   },
 ];
 
