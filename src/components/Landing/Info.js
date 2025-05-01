@@ -55,7 +55,7 @@ const Info = () => {
           transition={{ duration: 0.8, delay: 0.8 }}
         />
         <motion.span
-          className="text-white font-bold text-xl mt-4 block"
+          className="text-white font-bold text-4xl mt-4 block"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1 }}
