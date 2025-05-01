@@ -18,6 +18,7 @@ export default function Navbar() {
               AI Portal
             </span>
           </div>
+          {/* Hamburger Button for Mobile */}
           <div className="md:hidden">
             <button className="text-3xl" onClick={() => setshowMenu(!showMenu)}>
               {showMenu ? (
@@ -30,7 +31,9 @@ export default function Navbar() {
         </div>
 
         {/* Links Section */}
-        <div className={`md:flex items-center md:w-full justify-between ${showMenu ? "block" : "hidden md:flex"}`}>
+        <div
+          className={`md:flex items-center md:w-full justify-between ${showMenu ? "block" : "hidden md:flex"}`}
+        >
           <div className="flex flex-col md:flex-row md:items-center md:w-3/4">
             <ul className="flex flex-col md:flex-row md:justify-center gap-5 items-center w-full">
               <li className="nav-item mt-1 md:mt-0">
