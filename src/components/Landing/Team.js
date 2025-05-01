@@ -15,8 +15,8 @@ const teamMembers = [
     image: Bilal, // Local image reference
   },
   {
-    name: "Mam Nazia",
-    role: "MD",
+    name: "",
+    role: "Bussiness Manager",
     image: Nazia,
   },
   // {
