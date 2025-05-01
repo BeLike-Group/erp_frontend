@@ -45,6 +45,10 @@ const Footer = () => {
             <span className="text-[0.95rem]">+92 347 5800705</span>
           </div>
           <div className="flex items-center">
+            <FaPhone className="text-green-500 mr-2" size={20} />
+            <span className="text-[0.95rem]"> +92 300 6900769</span>
+          </div>
+          <div className="flex items-center">
             <FaEnvelope className="text-blue-400 mr-2" size={20} />
             <span className="text-[0.95rem]">beligroup35@gmail.com</span>
           </div>
