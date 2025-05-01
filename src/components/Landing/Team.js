@@ -1,6 +1,6 @@
 import React from "react";
 import Bilal from "./Pics/team/Bilal.jpg";
-import Nazia from "./Pics/team/blankPic.jpg";
+import Nazia from "./Pics/team/Nazia.png.jpg";
 import Mehek from "./Pics/team/Mehak.jpg";
 import Minahil from "./Pics/team/Minahil.jpg";
 import Faheem from "./Pics/team/Faheem.jpg";
@@ -17,7 +17,7 @@ const teamMembers = [
   {
     name: "Nazia Yasir Mehmood",
     role: "Managing Director",
-    image:
+    image: Nazia,
 
     image: Nazia,
   },
