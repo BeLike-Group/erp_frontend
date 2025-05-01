@@ -8,24 +8,27 @@ export default function Navbar() {
   const [showMenu, setshowMenu] = useState(false);
 
   return (
-    <div>
-      <nav className=" md:flex justify-between p-3 overflow-hidden bg-gradient-to-r from-blue-400 to-green-500">
-        <div className="flex items-center justify-between w-full md:w-1/4">
-          <img src={logo} className="w-[11rem] h-[4rem]" alt="" />
-          <div className="md:hidden">
-            <button
-              className="text-3xl"
-              onClick={() => setshowMenu(!showMenu)}
-            >
-              {showMenu ? (
-                <RxCross2 className="text-white" />
-              ) : (
-                <IoMenuSharp className="text-white" />
-              )}
-            </button>
-          </div>
-        </div>
-
+    <div className="flex items-center justify-between w-full md:w-1/4">
+    <div className="flex items-center gap-2">
+      <img src={logo} className="w-[11rem] h-[4rem]" alt="Logo" />
+      <span className="text-white font-bold text-xl hidden md:inline-block">
+        AI Portal
+      </span>
+    </div>
+    <div className="md:hidden">
+      <button
+        className="text-3xl"
+        onClick={() => setshowMenu(!showMenu)}
+      >
+        {showMenu ? (
+          <RxCross2 className="text-white" />
+        ) : (
+          <IoMenuSharp className="text-white" />
+        )}
+      </button>
+    </div>
+  </div>
+  
         <div
           className={`md:flex items-center md:w-full justify-between ${showMenu ? "block" : "hidden md:flex"}`}
         >
