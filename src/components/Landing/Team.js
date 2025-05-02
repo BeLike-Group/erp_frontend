@@ -60,45 +60,49 @@ const teamMembers = [
 ];
 
 // Team component
-const TeamSection = () => {
+const Team = () => {
   return (
-    <section className="text-gray-600 body-font bg-gray-100 py-16">
-      <div className="container px-5 mx-auto">
-        <div className="flex flex-col text-center w-full mb-16">
-          <h1 className="text-4xl font-bold title-font mb-4 text-gray-900">
-            Our Team
-          </h1>
-          <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
-            Meet the amazing people who make everything possible.
-          </p>
-        </div>
-        <div className="flex flex-wrap -m-2 justify-center">
-          {teamMembers.map((member, index) => (
-            <div key={index} className="p-2 lg:w-1/3 md:w-1/2 w-full">
-              <div
-                className={`h-full flex items-center bg-white hover:shadow-xl hover:bg-red-700 hover:text-white p-4 rounded-lg transform transition duration-300 hover:scale-105 ${
-                  index % 2 === 0 ? "delay-200" : "delay-400"
-                }`}
-              >
-                <img
-                  alt="team"
-                  src={member.image}
-                  className="w-[120px] h-[120px] rounded-full object-cover object-center border-4 border-white shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-105"
-                />
-                <div className="flex-grow ml-4">
-                  <h2 className="text-lg font-medium title-font">
-                    {member.name}
-                  </h2>
-                  <p className="text-gray-500 group-hover:text-white">
-                    {member.role}
-                  </p>
+    <div>
+      <section className="bg-gradient-to-r from-green-400 to-blue-500 text-black body-font p-4 "
+      
+      >
+        <div className="container px-5 py-24 mx-auto">
+          <div className="flex flex-col text-center w-full mb-20">
+            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-black hover:text-white">
+              Our Dedicated Team
+            </h1>
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
+              Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical
+              gentrify, subway tile poke farm-to-table. Franzen you probably
+              haven't heard of them.
+            </p>
+          </div>
+          <div className="flex flex-wrap -m-2">
+            {teamMembers.map((member, index) => (
+              <div key={index} className="p-2 lg:w-1/3 md:w-1/2 w-full">
+                <div
+                  className={`h-full flex items-center   hover:shadow-lg hover:shadow-slate-950 hover:bg-red-700 hover:text-white p-4 rounded-lg transform transition duration-300 hover:cursor-pointer hover:scale-105 fade-in-up ${
+                    index % 2 === 0 ? "delay-200" : "delay-400"
+                  }`}
+                >
+                  <img
+                    alt="team"
+                    className="w-16 h-16 bg-gray-100  object-center object-cover flex-shrink-0 rounded-full mr-4"
+                    src={member.image}
+                  />
+                  <div className="flex-grow">
+                    <h2 className=" title-font font-medium text-lg">
+                      {member.name}
+                    </h2>
+                    <p className="">{member.role}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 };
 
