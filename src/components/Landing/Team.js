@@ -8,6 +8,7 @@ import Gms from "./Pics/team/GMS.jpg";
 import Usman from "./Pics/team/Usman.jpg"; // Usman (Product Manager)
 import Ahmad from "./Pics/team/Ahmad.jpg";
 import Abrar from "./Pics/team/Abrar.jpg";
+import sheikh from "./Pics/team/sheikh.jpg";
 // Array of team members
 const teamMembers = [
   {
