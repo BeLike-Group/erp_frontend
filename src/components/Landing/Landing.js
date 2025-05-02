@@ -114,7 +114,7 @@ const Landingpage = () => {
           <div className="container mx-auto text-center">
             <h1 className="text-3xl sm:text-5xl font-bold text-white mb-8">
               Our IT Portal Services
-              <p className="text-[1rem] pt-2">(Belike Software)</p>
+              <p className="text-[1rem] pt-2">(Belike AI Portal Software)</p>
             </h1>
             <div id="servicesSection" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {services.map((service, index) => (
