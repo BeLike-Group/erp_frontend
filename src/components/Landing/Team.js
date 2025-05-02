@@ -7,7 +7,7 @@ import Faheem from "./Pics/team/Faheem.jpg";
 import Gms from "./Pics/team/GMS.jpg";
 import Usman from "./Pics/team/Usman.jpg"; // Usman (Product Manager)
 import Ahmad from "./Pics/team/Ahmad.jpg";
-import sheikh from "./Pics/team/Abrar.jpg";
+import Abrar from "./Pics/team/Abrar.jpg";
 // Array of team members
 const teamMembers = [
   {
@@ -32,9 +32,9 @@ const teamMembers = [
     image: Minahil,
   },
   {
-    name: "M.Usman",
-    role: "E-commerce Executive",
-    image: Usman,
+    name: "Wajid Saleem",
+    role: "BDM",
+    image: Ahmad,
   },
   {
     name: "Faheem Shaikh",
@@ -47,14 +47,14 @@ const teamMembers = [
     image: sheikh,
   },
   {
-    name: "Wajid Saleem",
-    role: "BDM",
-    image: Ahmad,
+    name: "M.Usman",
+    role: "E-commerce Executive",
+    image: Usman,
   },
   {
     name: "Abrar Amjad",
     role: "Web developer",
-    image: sheikh,
+    image: Abrar,
     
   },
 ];
