@@ -47,14 +47,14 @@ const teamMembers = [
     image: sheikh,
   },
   {
-    name: "Wajid saleem",
+    name: "Wajid Saleem",
     role: "BDM",
-    image: wajid,
+    image: Ahmad,
   },
   {
     name: "Abrar Amjad",
     role: "Web developer",
-    image: Abrar Amjad,
+    image: sheikh,
     
   },
 ];
