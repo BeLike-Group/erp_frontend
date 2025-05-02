@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="mb-4 sm:mb-0 mt-16">
             <img
               className="h-20 mx-12"
-              src="../../Assets/logo.png"
+              src="https://erp-frontend-hkql.vercel.app/static/media/logo.3a3cb8d082342adf9151.png"
               alt="Logo"
             />
           </div>
