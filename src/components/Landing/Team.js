@@ -10,17 +10,7 @@ import Ahmad from "./Pics/team/Ahmad.jpg";
 import sheikh from "./Pics/team/blankPic.jpg";
 // Array of team members
 const teamMembers = [
-  {
-    name: "M.Bilal Meher",
-    role: "Ceo & Founder",
-    image: Bilal, // Local image reference
-  },
-  {
-    name: "Nazia Yasir Mehmood",
-    role: "Managing Director",
-    image: Nazia,
-
-  },
+ 
   // {
   //   name: "",
   //   role: "COO",
