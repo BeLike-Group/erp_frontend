@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="mb-4 sm:mb-0 mt-16">
             <img
               className="h-20 mx-12"
-              src="https://www.belikegroup.org/static/media/logo.3a3cb8d082342adf9151.png"
+              src="../../Assets/logo.png"
               alt="Logo"
             />
           </div>
