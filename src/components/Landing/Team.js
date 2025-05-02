@@ -32,9 +32,9 @@ const teamMembers = [
     image: Minahil,
   },
   {
-    name: "M.Usman",
-    role: "E-commerce Executive",
-    image: Usman,
+    name: "Wajid Saleem",
+    role: "BDM",
+    image: Wajid,
   },
   {
     name: "Faheem Shaikh",
@@ -46,15 +46,16 @@ const teamMembers = [
     role: "Legal Advisor",
     image: sheikh,
   },
+  
   {
-    name: "Ahmad Usman",
-    role: "County project director",
-    image: Ahmad,
+    name: "M.Usman",
+    role: "E-commerce Executive",
+    image: Usman,
   },
-  {
-    name: "Sheikh Abubakar Kareem",
-    role: "Software Engineer",
-    image: sheikh,
+  {000
+    name: "Abrar Amjad",
+    role: "Web developer",
+    image: Abrar,
     
   },
 ];
