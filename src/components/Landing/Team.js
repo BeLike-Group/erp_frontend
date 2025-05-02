@@ -47,14 +47,14 @@ const teamMembers = [
     image: sheikh,
   },
   {
-    name: "Ahmad Usman",
-    role: "County project director",
-    image: Ahmad,
+    name: "Wajid saleem",
+    role: "BDM",
+    image: wajid,
   },
   {
-    name: "Sheikh Abubakar Kareem",
-    role: "Software Engineer",
-    image: sheikh,
+    name: "Abrar Amjad",
+    role: "Web developer",
+    image: Abrar Amjad,
     
   },
 ];
