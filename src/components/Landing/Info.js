@@ -17,7 +17,7 @@ const Info = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          Belike AI Portal
+          Belike Groups
         </motion.h1>
         <motion.p
           className="mb-8 text-xl text-black"
@@ -25,7 +25,7 @@ const Info = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Belike AI Portal services involve SEO, social media, PPC advertising
+          Belike Group services involve SEO, social media, PPC advertising
           <br /> content marketing, and email campaigns.
         </motion.p>
         <motion.ul
@@ -60,7 +60,7 @@ const Info = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1 }}
         >
-          Belike AI Portal
+          AI Portal
         </motion.span>
       </motion.div>
     </div>
