@@ -65,7 +65,7 @@ const Investor = () => {
         Our Valued Clients
       </h1>
       <p className="text-center text-black">
-        At Belike AI Portal, we prioritize our clients by offering tailored solutions 
+        At Belike Group, we prioritize our clients by offering tailored solutions 
         designed to meet their unique needs. <br />
         Our commitment to excellence ensures personalized support, <br />
         expert guidance, and a partnership built on trust and results.
