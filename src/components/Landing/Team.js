@@ -1,6 +1,6 @@
 import React from "react";
 import Bilal from "./Pics/team/Bilal.jpg";
-import Nazia from "./Pics/team/Nazia.jpg";
+import Nazia from "./Pics/team/Nazia.png.jpg";
 import Mehek from "./Pics/team/Mehak.jpg";
 import Minahil from "./Pics/team/Minahil.jpg";
 import Faheem from "./Pics/team/Faheem.jpg";
@@ -8,7 +8,6 @@ import Gms from "./Pics/team/GMS.jpg";
 import Usman from "./Pics/team/Usman.jpg"; // Usman (Product Manager)
 import Ahmad from "./Pics/team/Ahmad.jpg";
 import Abrar from "./Pics/team/Abrar.jpg";
-import sheikh from "./Pics/team/sheikh.jpg";
 // Array of team members
 const teamMembers = [
   {
@@ -33,9 +32,9 @@ const teamMembers = [
     image: Minahil,
   },
   {
-    name: "Wajid Saleem",
-    role: "BDM",
-    image: Ahmad,
+    name: "M.Usman",
+    role: "E-commerce Executive",
+    image: Usman,
   },
   {
     name: "Faheem Shaikh",
@@ -48,9 +47,9 @@ const teamMembers = [
     image: sheikh,
   },
   {
-    name: "M.Usman",
-    role: "E-commerce Executive",
-    image: Usman,
+    name: "Wajid Saleem",
+    role: "BDM",
+    image: Ahmad,
   },
   {
     name: "Abrar Amjad",
