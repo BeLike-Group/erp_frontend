@@ -1,6 +1,6 @@
 import React from "react";
 import Bilal from "./Pics/team/Bilal.jpg";
-import Nazia from "./Pics/team/Nazia.png.jpg";
+import Nazia from "./Pics/team/mam nazia.jpg";
 import Mehek from "./Pics/team/Mehak.jpg";
 import Minahil from "./Pics/team/Minahil.jpg";
 import Faheem from "./Pics/team/Faheem.jpg";
