@@ -35,7 +35,7 @@ const Info = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
         >
           <motion.li className="mb-2">
-            These strategies aim to boost online visibility engage
+            These strategies aim to bost online visibility engage
           </motion.li>
           <motion.li className="mb-2">
             audiences, and drive business growth by leveraging
