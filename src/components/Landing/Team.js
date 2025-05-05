@@ -2,15 +2,15 @@ import React from "react";
 import Bilal from "./Pics/team/Bilal.jpg";
 import Nazia from "./Pics/team/Nazia.jpg";
 import Minahil from "./Pics/team/Minahil.jpg";
-import Faheem from "./Pics/team/Faheem.jpg"; // Make sure this file exists!
+import Faheem from "./Pics/team/Faheem.jpg";
 import Usman from "./Pics/team/Usman.jpg";
 import Abrar from "./Pics/team/Abrar.jpg";
 
 // Array of team members
 const teamMembers = [
   {
-    name: "M. Bilal Meher",
-    role: "CEO & Founder",
+    name: "M.Bilal Meher",
+    role: "Ceo & Founder",
     image: Bilal,
   },
   {
@@ -24,7 +24,7 @@ const teamMembers = [
     image: Minahil,
   },
   {
-    name: "M. Usman",
+    name: "M.Usman",
     role: "E-commerce Executive",
     image: Usman,
   },
@@ -50,9 +50,7 @@ const Team = () => {
             Our Dedicated Team
           </h1>
           <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
-            Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical
-            gentrify, subway tile poke farm-to-table. Franzen you probably
-            haven't heard of them.
+            Meet the people who make everything possible behind the scenes.
           </p>
         </div>
         <div className="flex flex-wrap -m-2">
@@ -69,7 +67,9 @@ const Team = () => {
                   src={member.image}
                 />
                 <div className="flex-grow">
-                  <h2 className="title-font font-medium text-lg">{member.name}</h2>
+                  <h2 className="title-font font-medium text-lg">
+                    {member.name}
+                  </h2>
                   <p>{member.role}</p>
                 </div>
               </div>
