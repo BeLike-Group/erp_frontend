@@ -37,16 +37,6 @@ role: "Legal Advisor",
 image: Faheem,
 },
 {
-name: "Advocate Samiya Tahir",
-role: "Legal Advisor",
- image: Mehek,
-},
-{
-name: "Wajid Saleem",
-role: "BDM",
- image: Gms,
-},
-{
 name: "Abrar Amjad",
 role: "Web developer",
 image: Abrar,
