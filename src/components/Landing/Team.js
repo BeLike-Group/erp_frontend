@@ -44,7 +44,7 @@ image: Abrar,
 // Team component
 const Team = () => {
 return ( <div>
-\<section className="bg-gradient-to-r from-green-400 to-blue-500 text-black body-font p-4 "
+<section className="bg-gradient-to-r from-green-400 to-blue-500 text-black body-font p-4 "
 
 ```
   >
