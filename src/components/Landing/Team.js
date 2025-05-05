@@ -1,13 +1,13 @@
 import React from "react";
 import Bilal from "./Pics/team/Bilal.jpg";
-import Nazia from "./Pics/team/mam nazia.jpg";
+import Nazia from "./Pics/team/Nazia.jpg";
 import Mehek from "./Pics/team/Mehak.jpg";
 import Minahil from "./Pics/team/Minahil.jpg";
 import Faheem from "./Pics/team/Faheem.jpg";
 import Gms from "./Pics/team/GMS.jpg";
 import Usman from "./Pics/team/Usman.jpg"; // Usman (Product Manager)
 import Ahmad from "./Pics/team/Ahmad.jpg";
-import sheikh from "./Pics/team/A.jpg";
+import Abrar from "./Pics/team/Abrar.jpg";
 // Array of team members
 const teamMembers = [
   {
@@ -44,7 +44,7 @@ const teamMembers = [
   {
     name: "Advocate Samiya Tahir",
     role: "Legal Advisor",
-    // image: sheikh,
+    image: sheikh,
   },
   {
     name: "Ahmad Abdullah",
@@ -53,7 +53,7 @@ const teamMembers = [
   {
     name: "Abrar Amjad",
     role: "Web developer",
-    image: sheikh,
+    image: Abrar,
     
   },
 ];
