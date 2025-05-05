@@ -44,7 +44,7 @@ const teamMembers = [
   {
     name: "Advocate Samiya Tahir",
     role: "Legal Advisor",
-    image: sheikh,
+   // image: sheikh,
   },
   {
     name: "Ahmad Abdullah",
