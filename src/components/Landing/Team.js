@@ -6,7 +6,7 @@ import Faheem from "./Pics/team/Faheem.jpg";
 import Usman from "./Pics/team/Usman.jpg"; // Usman (Product Manager)
 import Abrar from "./Pics/team/Abrar.jpg";
 // Array of team members
-const teamMembers = \[
+const teamMembers = [
 {
 name: "M.Bilal Meher",
 role: "Ceo & Founder",
