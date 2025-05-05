@@ -1,12 +1,9 @@
 import React from "react";
 import Bilal from "./Pics/team/Bilal.jpg";
 import Nazia from "./Pics/team/Nazia.jpg";
-import Mehek from "./Pics/team/Mehak.jpg";
 import Minahil from "./Pics/team/Minahil.jpg";
 import Faheem from "./Pics/team/Faheem.jpg";
-import Gms from "./Pics/team/GMS.jpg";
 import Usman from "./Pics/team/Usman.jpg"; // Usman (Product Manager)
-import Ahmad from "./Pics/team/Ahmad.jpg";
 import Abrar from "./Pics/team/Abrar.jpg";
 // Array of team members
 const teamMembers = \[
