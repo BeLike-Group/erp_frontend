@@ -1,10 +1,5 @@
 import React from "react";
 import Bilal from "./Pics/team/Bilal.jpg";
-import Nazia from "./Pics/team/Nazia.jpg";
-import Minahil from "./Pics/team/Minahil.jpg";
-import Faheem from "./Pics/team/Faheem.jpg";
-import Usman from "./Pics/team/Usman.jpg";
-import Abrar from "./Pics/team/Abrar.jpg";
 
 // Array of team members
 const teamMembers = [
@@ -12,31 +7,6 @@ const teamMembers = [
     name: "M.Bilal Meher",
     role: "Ceo & Founder",
     image: Bilal,
-  },
-  {
-    name: "Nazia Yasir Mehmood",
-    role: "Managing Director",
-    image: Nazia,
-  },
-  {
-    name: "Minahil",
-    role: "Project Director",
-    image: Minahil,
-  },
-  {
-    name: "M.Usman",
-    role: "E-commerce Executive",
-    image: Usman,
-  },
-  {
-    name: "Faheem Shaikh",
-    role: "Legal Advisor",
-    image: Faheem,
-  },
-  {
-    name: "Abrar Amjad",
-    role: "Web Developer",
-    image: Abrar,
   },
 ];
 
