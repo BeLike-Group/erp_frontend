@@ -8,11 +8,7 @@ const Footer = () => {
         {/* Logo and Menu */}
         <div className="flex flex-row mb-4 sm:mb-0">
           <div className="mb-4 sm:mb-0 mt-16">
-            <img
-              className="h-20 mx-12"
-              src="https://erp-frontend-hkql.vercel.app/static/media/logo.3a3cb8d082342adf9151.png"
-              alt="Logo"
-            />
+            <h2>Belike Ai Portal</h2>
           </div>
           <div>
             <h1 className="text-2xl font-bold mx-12 py-0 hover:text-blue-900 mt-2 cursor-pointer">
