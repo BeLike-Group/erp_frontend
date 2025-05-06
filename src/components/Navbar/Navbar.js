@@ -13,9 +13,8 @@ export default function Navbar() {
         {/* Logo + Text + Hamburger */}
         <div className="flex items-center justify-between w-full md:w-1/4">
           <div className="flex items-center gap-2">
-            <img src={logo} className="w-[11rem] h-[4rem]" alt="Logo" />
             <span className="text-white font-bold text-xl hidden md:inline-block">
-              AI Portal
+             Belike AI Portal
             </span>
           </div>
           {/* Hamburger Button for Mobile */}
